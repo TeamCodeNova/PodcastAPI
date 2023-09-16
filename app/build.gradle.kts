@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.apollographql.apollo3").version("3.8.2")
 }
 
 android {
@@ -50,44 +51,31 @@ android {
 }
 
 dependencies {
-    // Kotlin and core dependencies
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
+    implementation("androidx.activity:activity-compose:1.6.1")
+    implementation(platform("androidx.compose:compose-bom:2023.01.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.navigation:navigation-compose:2.5.3")
+    implementation("androidx.security:security-crypto:1.1.0-alpha05")
+    implementation("io.coil-kt:coil-compose:2.2.2")
 
-    // Compose dependencies
-    implementation("androidx.compose.ui:ui:1.5.1")
-    implementation("androidx.compose.ui:ui-graphics:1.5.1")
-    implementation("androidx.compose.ui:ui-tooling:1.5.1")
-    implementation("androidx.compose.material:material:1.5.1")
-    implementation("androidx.compose.material3:material3:1.1.1")
-    implementation("androidx.compose.runtime:runtime:1.5.1")
+    implementation("com.apollographql.apollo3:apollo-runtime")
 
-    // Lifecycle and ViewModel dependencies
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-
-    // Activity Compose
-    implementation("androidx.activity:activity-compose:1.7.2")
-
-    // Retrofit and networking
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.1")
-
-    // Moshi for JSON
-    implementation("com.squareup.moshi:moshi:1.12.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.12.0")
-
-    // Testing dependencies
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2022.10.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
 
-    // Debugging dependencies
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.1")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.1")
-
-    // Additional Android test implementations
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+apollo {
+    service("service") {
+        packageName.set("com.example.podcastapi")
+    }
 }

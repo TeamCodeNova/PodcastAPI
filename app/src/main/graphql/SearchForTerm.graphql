@@ -1,0 +1,13 @@
+query SearchForTerm($term: String!, $filterForTypes: [TaddyType]) {
+    searchForTerm(
+        term: $term
+        filterForTypes: $filterForTypes
+    ) {
+        searchId
+        podcastSeries {
+            uuid
+            name
+            rssUrl
+        }
+    }
+}
