@@ -1,0 +1,2314 @@
+"""Exposes a URL that specifies the behavior of this scalar."""
+directive @specifiedBy(
+    """The URL that specifies the behavior of this scalar."""
+    url: String!
+) on SCALAR
+
+""" Comic Issue Details """
+type ComicIssue {
+    """ Unique identifier for a comic issue """
+    uuid: ID
+
+    """ Unique identifier for a comic series this issue belongs to """
+    seriesUuid: ID
+
+    """ Date when the issue was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The name (title) of the issue """
+    name: String
+
+    """ Short note from the creator for the issue """
+    creatorNote: String
+
+    """ Push notification message for the issue """
+    pushNotificationMessage: String
+
+    """ A different hash means that details for this issue have updated since the last hash
+    """
+    hash: String
+
+    """ A different hash means that details for the stories that make up this issue have updated since the last hash
+    """
+    storiesHash: String
+
+    """ The banner art for an issue """
+    bannerImageUrl(
+        """ (Optional) size / variant. Default is SMALL """
+        variant: ImageVariant
+    ): String
+
+    """ The thumbnail art for an issue """
+    thumbnailImageUrl: String
+
+    """ Stringified JSON details for the banner art. Convert to JSON to use."""
+    bannerImageAsString: String
+
+    """ Stringified JSON details for the thumbnail art. Convert to JSON to use.
+    """
+    thumbnailImageAsString: String
+
+    """ All the story images fo this issue """
+    storyImageUrls: [String]
+
+    """ Details on all the stories that make up this issue """
+    stories: [ComicStory]
+
+    """ Position of this issue in relation to other issues. This is used to sort issues by oldest or latest in a series.
+    """
+    position: Int
+
+    """ If the issue has now been removed from the SSS Feed """
+    isRemoved: Boolean
+
+    """
+    If the content has violated Taddy's distribution policies for illegal or
+    harmful content it will be blocked from getting any updates
+    """
+    isBlocked: Boolean
+
+    """ Details on the comic for which this issue belongs to """
+    comicSeries: ComicSeries
+}
+
+""" Comic Details """
+type ComicSeries {
+    """ Unique identifier for this comic """
+    uuid: ID
+
+    """ Date when the comic was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The name (title) for a comic """
+    name: String
+
+    """ The description for a comic """
+    description: String
+
+    """ The cover art for a comic """
+    coverImageUrl(
+        """ (Optional) size / variant. Default is SMALL """
+        variant: ImageVariant
+    ): String
+
+    """ The banner art for a comic """
+    bannerImageUrl(
+        """ (Optional) size / variant. Default is SMALL """
+        variant: ImageVariant
+    ): String
+
+    """ The thumbnail art for a comic """
+    thumbnailImageUrl: String
+
+    """ Stringified JSON details for the cover art. Convert to JSON to use."""
+    coverImageAsString: String
+
+    """ Stringified JSON details for the banner art. Convert to JSON to use."""
+    bannerImageAsString: String
+
+    """ Stringified JSON details for the thumbnail art. Convert to JSON to use.
+    """
+    thumbnailImageAsString: String
+
+    """
+    A hash of all comic details. It may be useful for you to save this property in
+    your database and compare it to know if any comic details have updated since
+    the last time you checked
+    """
+    hash: String
+
+    """
+    A hash of the details for all issues for this comic. It may be useful for you
+    to save this property in your database and compare it to know if there are any
+    new or updated issues since the last time you checked
+    """
+    issuesHash: String
+
+    """ A list of issues for this comic """
+    issues(
+        """
+        (Optional) Returns issues based on SortOrder. Default is LATEST (newest
+        issues first), another option is OLDEST (oldest issues first), and another
+        option is SEARCH (pass in the property searchTerm) to filter for issues by
+        title or description.
+        """
+        sortOrder: SortOrder
+
+        """ (Optional) Taddy paginates the results returned. Default is 1, Max value allowed is 1000
+        """
+        page: Int
+
+        """ (Optional) Return up to this number of issues. Default is 10, Max value allowed is 25 results per page
+        """
+        limitPerPage: Int
+
+        """
+        (Optional) Only to be used when sortOrder is SEARCH. Filters through the
+        title & description of issues for the searchTerm
+        """
+        searchTerm: String
+
+        """
+        (Optional) The option to show issues that were once on the SSS feed but have
+        now been removed. Default is false (do not include removed episodes)
+        """
+        includeRemovedIssues: Boolean
+    ): [ComicIssue]
+
+    """ The number of issues for this comic """
+    totalIssuesCount(
+        """
+        (Optional) Option to include issues that were once on the SSS feed but have
+        now been removed. Default is false (do not include removed episodes)
+        """
+        includeRemovedIssues: Boolean
+    ): Int
+
+    """ Tags for the comic """
+    tags: [String]
+
+    """ A comic can belong to multiple genres but they are listed in order of importance.
+    """
+    genres: [Genre]
+
+    """ The language the comic is in """
+    language: Language
+
+    """ Creators of the comic """
+    creators: [Creator]
+
+    """ Layout type of the comic """
+    seriesType: ComicSeriesType
+
+    """ Rating of the comic """
+    contentRating: ContentRating
+
+    """ Url for the comic's SSS feed """
+    sssUrl: String
+
+    """ Name to use for contacting the owner of this feed """
+    sssOwnerName: String
+
+    """ Email to use for contacting the owner of this feed """
+    sssOwnerPublicEmail: String
+
+    """ Copyright details for this feed """
+    copyright: String
+
+    """ Details on how often the SSS feed is checked for new details """
+    feedRefreshDetails: FeedRefreshDetails
+
+    """ If the comic is finished / complete """
+    isCompleted: Boolean
+
+    """
+    If the content has violated Taddy's distribution policies for illegal or
+    harmful content it will be blocked from getting any updates
+    """
+    isBlocked: Boolean
+}
+
+""" Type of comic series (just webtoon for now) """
+enum ComicSeriesType {
+    WEBTOON
+}
+
+""" Comic Story Details """
+type ComicStory {
+    """ Unique identifier for a comic story """
+    uuid: ID
+
+    """ Unique identifier for a comic issue this story belongs to """
+    issueUuid: ID
+
+    """ Unique identifier for a comic series this story belongs to """
+    seriesUuid: ID
+
+    """ A different hash means that details for this story have updated since the last hash
+    """
+    hash: String
+
+    """ The story art """
+    storyImageUrl: String
+
+    """ Stringified JSON details for the story art. Convert to JSON to use."""
+    storyImageAsString: String
+
+    """ If the story has now been removed from the SSS Feed """
+    isRemoved: Boolean
+
+    """ Details on the comic issue that this story belongs to """
+    comicIssue: ComicIssue
+
+    """ Details on the comic series that this story belongs to """
+    comicSeries: ComicSeries
+}
+
+""" Details on all internal series """
+type ContentInternalSeriesList {
+    """ The content uuid """
+    contentUuid: ID
+
+    """ The content type """
+    contentType: String
+
+    """ List of internal comic series """
+    internalcomicseries: [InternalComicSeries]
+
+    """ List of creator feeds """
+    internalcreators: [InternalCreator]
+}
+
+""" Content rating for different media types. Follows format: TYPE_RATING
+"""
+enum ContentRating {
+    COMICSERIES_BABY
+    COMICSERIES_KIDS
+    COMICSERIES_TEENS
+    COMICSERIES_MATURE_TEENS
+    COMICSERIES_ADULTS
+    COMICSERIES_PORNOGRAPHY
+}
+
+""" Content roles for different media types. Follows format: TYPE_ROLE_SUBROLE
+"""
+enum ContentRole {
+    COMICSERIES_ARTIST
+    COMICSERIES_ARTIST_PENCILER
+    COMICSERIES_ARTIST_INKER
+    COMICSERIES_ARTIST_COLORIST
+    COMICSERIES_ARTIST_LETTERER
+    COMICSERIES_WRITER
+    COMICSERIES_PRODUCER
+    COMICSERIES_EDITOR
+    COMICSERIES_TRANSLATOR
+}
+
+""" Countries """
+enum Country {
+    AFGHANISTAN
+    ALAND_ISLANDS
+    ALBANIA
+    ALGERIA
+    AMERICAN_SAMOA
+    ANDORRA
+    ANGOLA
+    ANGUILLA
+    ANTARCTICA
+    ANTIGUA_AND_BARBUDA
+    ARGENTINA
+    ARMENIA
+    ARUBA
+    AUSTRALIA
+    AUSTRIA
+    AZERBAIJAN
+    BAHAMAS
+    BAHRAIN
+    BANGLADESH
+    BARBADOS
+    BELARUS
+    BELGIUM
+    BELIZE
+    BENIN
+    BERMUDA
+    BHUTAN
+    BOLIVIA_PLURINATIONAL_STATE_OF
+    BONAIRE_SINT_EUSTATIUS_AND_SABA
+    BOSNIA_AND_HERZEGOVINA
+    BOTSWANA
+    BOUVET_ISLAND
+    BRAZIL
+    BRITISH_INDIAN_OCEAN_TERRITORY_THE
+    BRUNEI_DARUSSALAM
+    BULGARIA
+    BURKINA_FASO
+    BURUNDI
+    CABO_VERDE
+    CAMBODIA
+    CAMEROON
+    CANADA
+    CAYMAN_ISLANDS
+    CENTRAL_AFRICAN_REPUBLIC
+    CHAD
+    CHILE
+    CHINA
+    CHRISTMAS_ISLAND
+    COCOS_KEELING_ISLANDS
+    COLOMBIA
+    COMOROS
+    CONGO
+    CONGO_THE_DEMOCRATIC_REPUBLIC_OF
+    COOK_ISLANDS
+    COSTA_RICA
+    COTE_D_IVOIRE
+    CROATIA
+    CUBA
+    CURACAO
+    CYPRUS
+    CZECHIA
+    DENMARK
+    DJIBOUTI
+    DOMINICA
+    DOMINICAN_REPUBLIC
+    ECUADOR
+    EGYPT
+    EL_SALVADOR
+    EQUATORIAL_GUINEA
+    ERITREA
+    ESTONIA
+    ESWATINI
+    ETHIOPIA
+    FALKLAND_ISLANDS_THE_MALVINAS
+    FAROE_ISLANDS
+    FIJI
+    FINLAND
+    FRANCE
+    FRENCH_GUIANA
+    FRENCH_POLYNESIA
+    FRENCH_SOUTHERN_TERRITORIES
+    GABON
+    GAMBIA
+    GEORGIA
+    GERMANY
+    GHANA
+    GIBRALTAR
+    GREECE
+    GREENLAND
+    GRENADA
+    GUADELOUPE
+    GUAM
+    GUATEMALA
+    GUERNSEY
+    GUINEA
+    GUINEA_BISSAU
+    GUYANA
+    HAITI
+    HEARD_ISLAND_AND_MCDONALD_ISLANDS
+    HOLY_SEE
+    HONDURAS
+    HONG_KONG
+    HUNGARY
+    ICELAND
+    INDIA
+    INDONESIA
+    IRAN
+    IRAQ
+    IRELAND
+    ISLE_OF_MAN
+    ISRAEL
+    ITALY
+    JAMAICA
+    JAPAN
+    JERSEY
+    JORDAN
+    KAZAKHSTAN
+    KENYA
+    KIRIBATI
+    KOREA_NORTH
+    KOREA_SOUTH
+    KUWAIT
+    KYRGYZSTAN
+    LAO_PEOPLES_DEMOCRATIC_REPUBLIC_THE
+    LATVIA
+    LEBANON
+    LESOTHO
+    LIBERIA
+    LIBYA
+    LIECHTENSTEIN
+    LITHUANIA
+    LUXEMBOURG
+    MACAO
+    MADAGASCAR
+    MALAWI
+    MALAYSIA
+    MALDIVES
+    MALI
+    MALTA
+    MARSHALL_ISLANDS
+    MARTINIQUE
+    MAURITANIA
+    MAURITIUS
+    MAYOTTE
+    MEXICO
+    MICRONESIA_FEDERATED_STATES
+    MINOR_OUTLYING_ISLANDS_US
+    MOLDOVA_THE_REPUBLIC
+    MONACO
+    MONGOLIA
+    MONTENEGRO
+    MONTSERRAT
+    MOROCCO
+    MOZAMBIQUE
+    MYANMAR
+    NAMIBIA
+    NAURU
+    NEPAL
+    NETHERLANDS
+    NEW_CALEDONIA
+    NEW_ZEALAND
+    NICARAGUA
+    NIGER
+    NIGERIA
+    NIUE
+    NORFOLK_ISLAND
+    NORTH_MACEDONIA
+    NORTHERN_MARIANA_ISLANDS
+    NORWAY
+    OMAN
+    PAKISTAN
+    PALAU
+    PALESTINE_STATE
+    PANAMA
+    PAPUA_NEW_GUINEA
+    PARAGUAY
+    PERU
+    PHILIPPINES
+    PITCAIRN
+    POLAND
+    PORTUGAL
+    PUERTO_RICO
+    QATAR
+    REUNION
+    ROMANIA
+    RUSSIA
+    RWANDA
+    SAINT_BARTHELEMY
+    SAINT_HELENA_ASCENSION_AND_TRISTAN_DA_CUNHA
+    SAINT_KITTS_AND_NEVIS
+    SAINT_LUCIA
+    SAINT_MARTIN_FRENCH_PART
+    SAINT_PIERRE_AND_MIQUELON
+    SAINT_VINCENT_AND_THE_GRENADINES
+    SAMOA
+    SAN_MARINO
+    SAO_TOME_AND_PRINCIPE
+    SAUDI_ARABIA
+    SENEGAL
+    SERBIA
+    SEYCHELLES
+    SIERRA_LEONE
+    SINGAPORE
+    SINT_MAARTEN_DUTCH_PART
+    SLOVAKIA
+    SLOVENIA
+    SOLOMON_ISLANDS
+    SOMALIA
+    SOUTH_AFRICA
+    SOUTH_GEORGIA_AND_THE_SOUTH_SANDWICH_ISLANDS
+    SOUTH_SUDAN
+    SPAIN
+    SRI_LANKA
+    SUDAN
+    SURINAME
+    SVALBARD_AND_JAN_MAYEN
+    SWEDEN
+    SWITZERLAND
+    SYRIA
+    TAIWAN
+    TAJIKISTAN
+    TANZANIA
+    THAILAND
+    TIMOR_LESTE
+    TOGO
+    TOKELAU
+    TONGA
+    TRINIDAD_AND_TOBAGO
+    TUNISIA
+    TURKEY
+    TURKMENISTAN
+    TURKS_AND_CAICOS_ISLANDS
+    TUVALU
+    UGANDA
+    UKRAINE
+    UNITED_ARAB_EMIRATES
+    UNITED_KINGDOM
+    UNITED_STATES_OF_AMERICA
+    URUGUAY
+    UZBEKISTAN
+    VANUATU
+    VENEZUELA
+    VIETNAM
+    VIRGIN_ISLANDS_BRITISH
+    VIRGIN_ISLANDS_US
+    WALLIS_AND_FUTUNA
+    WESTERN_SAHARA
+    YEMEN
+    ZAMBIA
+    ZIMBABWE
+}
+
+""" Creator Details """
+type Creator {
+    """ Unique identifier for this creator """
+    uuid: ID
+
+    """ Date when the creator feed was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The name of the creator """
+    name: String
+
+    """ A short bio on the creator """
+    bio: String
+
+    """ The avatar image for the creator"""
+    avatarImageUrl(
+        """ (Optional) size / variant. Default is SMALL """
+        variant: ImageVariant
+    ): String
+
+    """ Stringified JSON details for the avatar image. Convert to JSON to use.
+    """
+    avatarImageAsString: String
+
+    """
+    A hash of all creator details. It may be useful for you to save this property
+    in your database and compare it to know if any details have updated since the
+    last time you checked
+    """
+    hash: String
+
+    """
+    A hash of the details for all different content a creator makes. It may be
+    useful for you to save this property in your database and compare it to know
+    if there are any new or updated content since the last time you checked
+    """
+    contentHash: String
+
+    """ A list of content for this creator """
+    content(
+        """ Sort order for the results. Default is LATEST (newest first), another option is OLDEST (oldest first)
+        """
+        sortOrder: SortOrder
+
+        """ (Optional) Taddy paginates the results returned. Default is 1, Max value allowed is 1000
+        """
+        page: Int
+
+        """ (Optional) Return up to this number of results. Default is 10, Max value allowed is 25 results per page
+        """
+        limitPerPage: Int
+    ): [CreatorContent]
+
+    """ The total number of content from this creator """
+    totalContentCount: Int
+
+    """ Tags for the creator """
+    tags: [String]
+
+    """ Stringified JSON details for the links to creator's website, email, or social media. Convert to JSON to use.
+    """
+    linksAsString: String
+
+    """ Links to creator's website, email, or social media """
+    links: [LinkDetails]
+
+    """ The country in which the creator is resides in or is from """
+    country: Country
+
+    """ Url for the creator's SSS feed """
+    sssUrl: String
+
+    """ Name to use for contacting the owner of this feed """
+    sssOwnerName: String
+
+    """ Email to use for contacting the owner of this feed """
+    sssOwnerPublicEmail: String
+
+    """ Copyright details for this feed """
+    copyright: String
+
+    """ Details on how often the SSS feed is checked for new details """
+    feedRefreshDetails: FeedRefreshDetails
+
+    """
+    If the content has violated Taddy's distribution policies for illegal or
+    harmful content it will be blocked from getting any updates
+    """
+    isBlocked: Boolean
+}
+
+""" CreatorContent Details """
+type CreatorContent {
+    """ Unique identifier for this creatorcontent """
+    uuid: ID
+
+    """ A hash of all creatorcontent details """
+    hash: String
+
+    """ Unique identifier for the creator """
+    creatorUuid: ID
+
+    """ Unique identifier for the content """
+    contentUuid: ID
+
+    """ Content type """
+    contentType: TaddyType
+
+    """ Roles for the creator for this content """
+    roles: [ContentRole]
+
+    """ Position on the creator feed """
+    position: Int
+
+    """ Position on the content feed """
+    contentPosition: Int
+}
+
+""" Developer Application Details """
+type DevApp {
+    """ The id for the app"""
+    id: ID
+
+    """ The API key for the app (Only the owner of the app can access this)"""
+    apiKey: String
+}
+
+""" Documentation marketing pages for Taddy """
+type Documentation {
+    """ The id corresponding to an equivalent notion page """
+    id: ID
+
+    """ All the text in the document """
+    text: String
+}
+
+""" Feed Refresh Details """
+type FeedRefreshDetails {
+    """ Taddy's unique identifier """
+    uuid: ID
+
+    """ How often a feed is refreshed """
+    priority: FeedRefreshPriority
+
+    """ The reason why feed has a LOW, INACTIVE, or NEVER priority """
+    priorityReason: FeedRefreshPriorityReason
+
+    """ Date when the feed was refreshed last (Epoch time in seconds) """
+    dateLastRefreshed: Int
+
+    """ Websub Details (if available)"""
+    websubDetails: WebsubDetails
+}
+
+""" Different categories for how often a feed is refreshed """
+enum FeedRefreshPriority {
+    """ Feed checked immediately (within 30 mins) after it has been updated (via a Websub notification)
+    """
+    WEBSUB
+
+    """ Feed is checked every 4 hours for new updates """
+    HIGH
+
+    """ Feed is checked once a day for new updates """
+    REGULAR
+
+    """ Feed is checked once a week for new updates """
+    LOW
+
+    """ Feed is checked once a week for new updates """
+    INACTIVE
+
+    """ Feed is no longer checked for updates """
+    NEVER
+}
+
+""" The different types of reasons why a feed has a LOW, INACTIVE, or NEVER priority
+"""
+enum FeedRefreshPriorityReason {
+    """ Feed has not had any updates in the last 12 months """
+    INACTIVE_FOR_OVER_1_YEAR
+
+    """ There is another feed in our database that links to the same content """
+    DUPLICATE_FEED
+
+    """ Error parsing document when trying to check the feed for new updates"""
+    ERROR_PARSING_FEED
+
+    """ Error when trying to load the feed url (404 error, etc)"""
+    FEED_URL_NOT_WORKING
+}
+
+""" Genres for different media types. Follows format: TYPE_GENRE_SUBGENRE
+"""
+enum Genre {
+    PODCASTSERIES_ARTS
+    PODCASTSERIES_ARTS_BOOKS
+    PODCASTSERIES_ARTS_DESIGN
+    PODCASTSERIES_ARTS_FASHION_AND_BEAUTY
+    PODCASTSERIES_ARTS_FOOD
+    PODCASTSERIES_ARTS_PERFORMING_ARTS
+    PODCASTSERIES_ARTS_VISUAL_ARTS
+    PODCASTSERIES_BUSINESS
+    PODCASTSERIES_BUSINESS_CAREERS
+    PODCASTSERIES_BUSINESS_ENTREPRENEURSHIP
+    PODCASTSERIES_BUSINESS_INVESTING
+    PODCASTSERIES_BUSINESS_MANAGEMENT
+    PODCASTSERIES_BUSINESS_MARKETING
+    PODCASTSERIES_BUSINESS_NON_PROFIT
+    PODCASTSERIES_COMEDY
+    PODCASTSERIES_COMEDY_INTERVIEWS
+    PODCASTSERIES_COMEDY_IMPROV
+    PODCASTSERIES_COMEDY_STANDUP
+    PODCASTSERIES_EDUCATION
+    PODCASTSERIES_EDUCATION_COURSES
+    PODCASTSERIES_EDUCATION_HOW_TO
+    PODCASTSERIES_EDUCATION_LANGUAGE_LEARNING
+    PODCASTSERIES_EDUCATION_SELF_IMPROVEMENT
+    PODCASTSERIES_FICTION
+    PODCASTSERIES_FICTION_COMEDY_FICTION
+    PODCASTSERIES_FICTION_DRAMA
+    PODCASTSERIES_FICTION_SCIENCE_FICTION
+    PODCASTSERIES_GOVERNMENT
+    PODCASTSERIES_HISTORY
+    PODCASTSERIES_HEALTH_AND_FITNESS
+    PODCASTSERIES_HEALTH_AND_FITNESS_ALTERNATIVE_HEALTH
+    PODCASTSERIES_HEALTH_AND_FITNESS_FITNESS
+    PODCASTSERIES_HEALTH_AND_FITNESS_MEDICINE
+    PODCASTSERIES_HEALTH_AND_FITNESS_MENTAL_HEALTH
+    PODCASTSERIES_HEALTH_AND_FITNESS_NUTRITION
+    PODCASTSERIES_HEALTH_AND_FITNESS_SEXUALITY
+    PODCASTSERIES_KIDS_AND_FAMILY
+    PODCASTSERIES_KIDS_AND_FAMILY_EDUCATION_FOR_KIDS
+    PODCASTSERIES_KIDS_AND_FAMILY_PARENTING
+    PODCASTSERIES_KIDS_AND_FAMILY_PETS_AND_ANIMALS
+    PODCASTSERIES_KIDS_AND_FAMILY_STORIES_FOR_KIDS
+    PODCASTSERIES_LEISURE
+    PODCASTSERIES_LEISURE_ANIMATION_AND_MANGA
+    PODCASTSERIES_LEISURE_AUTOMOTIVE
+    PODCASTSERIES_LEISURE_AVIATION
+    PODCASTSERIES_LEISURE_CRAFTS
+    PODCASTSERIES_LEISURE_GAMES
+    PODCASTSERIES_LEISURE_HOBBIES
+    PODCASTSERIES_LEISURE_HOME_AND_GARDEN
+    PODCASTSERIES_LEISURE_VIDEO_GAMES
+    PODCASTSERIES_MUSIC
+    PODCASTSERIES_MUSIC_COMMENTARY
+    PODCASTSERIES_MUSIC_HISTORY
+    PODCASTSERIES_MUSIC_INTERVIEWS
+    PODCASTSERIES_NEWS
+    PODCASTSERIES_NEWS_BUSINESS
+    PODCASTSERIES_NEWS_DAILY_NEWS
+    PODCASTSERIES_NEWS_ENTERTAINMENT
+    PODCASTSERIES_NEWS_COMMENTARY
+    PODCASTSERIES_NEWS_POLITICS
+    PODCASTSERIES_NEWS_SPORTS
+    PODCASTSERIES_NEWS_TECH
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_BUDDHISM
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_CHRISTIANITY
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_HINDUISM
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_ISLAM
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_JUDAISM
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_RELIGION
+    PODCASTSERIES_RELIGION_AND_SPIRITUALITY_SPIRITUALITY
+    PODCASTSERIES_SCIENCE
+    PODCASTSERIES_SCIENCE_ASTRONOMY
+    PODCASTSERIES_SCIENCE_CHEMISTRY
+    PODCASTSERIES_SCIENCE_EARTH_SCIENCES
+    PODCASTSERIES_SCIENCE_LIFE_SCIENCES
+    PODCASTSERIES_SCIENCE_MATHEMATICS
+    PODCASTSERIES_SCIENCE_NATURAL_SCIENCES
+    PODCASTSERIES_SCIENCE_NATURE
+    PODCASTSERIES_SCIENCE_PHYSICS
+    PODCASTSERIES_SCIENCE_SOCIAL_SCIENCES
+    PODCASTSERIES_SOCIETY_AND_CULTURE
+    PODCASTSERIES_SOCIETY_AND_CULTURE_DOCUMENTARY
+    PODCASTSERIES_SOCIETY_AND_CULTURE_PERSONAL_JOURNALS
+    PODCASTSERIES_SOCIETY_AND_CULTURE_PHILOSOPHY
+    PODCASTSERIES_SOCIETY_AND_CULTURE_PLACES_AND_TRAVEL
+    PODCASTSERIES_SOCIETY_AND_CULTURE_RELATIONSHIPS
+    PODCASTSERIES_SPORTS
+    PODCASTSERIES_SPORTS_BASEBALL
+    PODCASTSERIES_SPORTS_BASKETBALL
+    PODCASTSERIES_SPORTS_CRICKET
+    PODCASTSERIES_SPORTS_FANTASY_SPORTS
+    PODCASTSERIES_SPORTS_FOOTBALL
+    PODCASTSERIES_SPORTS_GOLF
+    PODCASTSERIES_SPORTS_HOCKEY
+    PODCASTSERIES_SPORTS_RUGBY
+    PODCASTSERIES_SPORTS_RUNNING
+    PODCASTSERIES_SPORTS_SOCCER
+    PODCASTSERIES_SPORTS_SWIMMING
+    PODCASTSERIES_SPORTS_TENNIS
+    PODCASTSERIES_SPORTS_VOLLEYBALL
+    PODCASTSERIES_SPORTS_WILDERNESS
+    PODCASTSERIES_SPORTS_WRESTLING
+    PODCASTSERIES_TECHNOLOGY
+    PODCASTSERIES_TRUE_CRIME
+    PODCASTSERIES_TV_AND_FILM
+    PODCASTSERIES_TV_AND_FILM_AFTER_SHOWS
+    PODCASTSERIES_TV_AND_FILM_HISTORY
+    PODCASTSERIES_TV_AND_FILM_INTERVIEWS
+    PODCASTSERIES_TV_AND_FILM_FILM_REVIEWS
+    PODCASTSERIES_TV_AND_FILM_TV_REVIEWS
+    COMICSERIES_ACTION
+    COMICSERIES_COMEDY
+    COMICSERIES_CRIME
+    COMICSERIES_DRAMA
+    COMICSERIES_EDUCATIONAL
+    COMICSERIES_FANTASY
+    COMICSERIES_HISTORICAL
+    COMICSERIES_HORROR
+    COMICSERIES_INSPIRATIONAL
+    COMICSERIES_MYSTERY
+    COMICSERIES_ROMANCE
+    COMICSERIES_SCI_FI
+    COMICSERIES_SLICE_OF_LIFE
+    COMICSERIES_SUPERHERO
+    COMICSERIES_SUPERNATURAL
+    COMICSERIES_WHOLESOME
+    COMICSERIES_BL
+    COMICSERIES_GL
+    COMICSERIES_LGBTQ
+    COMICSERIES_THRILLER
+    COMICSERIES_ZOMBIES
+    COMICSERIES_POST_APOCALYPTIC
+    COMICSERIES_SCHOOL
+    COMICSERIES_SPORTS
+    COMICSERIES_ANIMALS
+    COMICSERIES_GAMING
+}
+
+""" Image Size / Variant """
+enum ImageVariant {
+    SMALL
+    MEDIUM
+    LARGE
+}
+
+""" ComicIssue Details (for just the comics created on Taddy)"""
+type InternalComicIssue {
+    """ Id of the internal comic issue"""
+    id: ID
+
+    """ Taddy's unique identifier (an uuid) """
+    uuid: ID
+
+    """ Date when the comic is created (Epoch time in seconds)"""
+    createdAt: Int
+
+    """ Date when the comic is scheduled to be published (Epoch time in seconds)
+    """
+    publishAt: Int
+
+    """ Date when the comic was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The publishing status for the comic issue """
+    status: InternalPublishStatus
+
+    """ The processing status for images for the comic issue """
+    imagesStatus: InternalPublishImageStatus
+
+    """ The name (title) for an issue """
+    name: String
+
+    """ The description (Creator Note) for an issue """
+    description: String
+
+    """ The push notification text for an issue """
+    pushNotificationMessage: String
+
+    """ The banner art for an issue """
+    bannerImageUrl: String
+
+    """ The thumbnail art for an issue """
+    thumbnailImageUrl: String
+
+    """ All the story art for an issue """
+    imageUrls: [String]
+
+    """ All the processing images for an issue """
+    imageUrlsProcessing: [String]
+
+    """ The series Uuid that this issue belongs to """
+    seriesUuid: ID
+
+    """ The series that this issue belongs to """
+    series: InternalComicSeries
+
+    """ The stories for an issue """
+    stories: [InternalComicStory]
+
+    """ If the comic has violated Taddy's distribution policies for illegal or harmful content
+    """
+    isBlocked: Boolean
+
+    """ The reason for blocking the comic """
+    blockedReason: String
+}
+
+""" ComicSeries Details (for just the comics created on Taddy)"""
+type InternalComicSeries {
+    """ Id of the internal comic series"""
+    id: ID
+
+    """ Taddy's unique identifier (an uuid) """
+    uuid: ID
+
+    """ Date when the comic was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The publishing status for the comic """
+    status: InternalPublishStatus
+
+    """ The processing status for images for the comic series """
+    imagesStatus: InternalPublishImageStatus
+
+    """ The name (title) for a comic """
+    name: String
+
+    """ The description for a comic """
+    description(
+        """
+        (Optional) Option to remove the html tags from the description or leave the
+        description as is (which may include html tags). Default is false (leave
+        description as is).
+        """
+        shouldStripHtmlTags: Boolean
+    ): String
+
+    """ The cover art for a comic """
+    coverImageUrl: String
+
+    """ The banner art for a comic """
+    bannerImageUrl: String
+
+    """ The thumbnail art for a comic """
+    thumbnailImageUrl: String
+
+    """ Comic type (just webtoon for now) """
+    seriesType: ComicSeriesType
+
+    """ A main genre for the comic """
+    genre1: Genre
+
+    """ The secondary genre for the comic """
+    genre2: Genre
+
+    """ Language spoken on the comic """
+    language: Language
+
+    """ Rating of the comic """
+    rating: ContentRating
+
+    """ Tags associated with the comic. Max of 12 tags """
+    tags: [String]
+
+    """ Copyright details for the comic """
+    copyright: String
+
+    """ Name to use for contacting the owner of the comic feed """
+    sssOwnerName: String
+
+    """ Email to use for contacting the owner of the comic feed """
+    sssOwnerPublicEmail: String
+
+    """ If the comic is finished / complete """
+    isComplete: Boolean
+
+    """ A list of issues for this comic series """
+    issues(
+        """
+        (Optional) Returns issues based on SortOrder. Default is LATEST (newest
+        issues first), another option is OLDEST (oldest issues first)
+        """
+        sortOrder: SortOrder
+
+        """ (Optional) Taddy paginates the results returned. Default is 1, Max value allowed is 20.
+        """
+        page: Int
+
+        """ (Optional) Return up to this number of episodes. Default is 10, Max value allowed is 25 results per page
+        """
+        limitPerPage: Int
+
+        """ (Optional) Filter by status """
+        filterForStatus: InternalPublishStatus
+    ): [InternalComicIssue]
+
+    """ If the comic has violated Taddy's distribution policies for illegal or harmful content
+    """
+    isBlocked: Boolean
+
+    """ The reason for blocking the comic """
+    blockedReason: String
+
+    """ Helpful counts for the comic """
+    counts: InternalSeriesCounts
+
+    """ The creators and roles of the comic """
+    creatorRoles: [InternalCreatorRoles]
+}
+
+""" ComicStory Details (for just the comics created on Taddy)"""
+type InternalComicStory {
+    """ Id of the internal comic story"""
+    id: ID
+
+    """ Taddy's unique identifier (an uuid) """
+    uuid: ID
+
+    """ The art for the story """
+    imageUrl: String
+
+    """ The position of the story in the issue """
+    position: Int
+}
+
+""" InternalCreator details """
+type InternalCreator {
+    """ Id of the internal creator series"""
+    id: ID
+
+    """ Taddy's unique identifier (an uuid) """
+    uuid: ID
+
+    """ Date when the internal creator feed was published (Epoch time in seconds)
+    """
+    datePublished: Int
+
+    """ The publishing status for the creator feed """
+    status: InternalPublishStatus
+
+    """ The processing status for images for the creator feed  """
+    imagesStatus: InternalPublishImageStatus
+
+    """ The creator's name """
+    name: String
+
+    """ The creator's bio"""
+    bio(
+        """
+        (Optional) Option to remove the html tags from the description or leave the
+        description as is (which may include html tags). Default is false (leave
+        description as is).
+        """
+        shouldStripHtmlTags: Boolean
+    ): String
+
+    """ The creator's avatar """
+    avatarImageUrl: String
+
+    """ Country where the creator resides or is based """
+    country: Country
+
+    """ Other social media links for the creator """
+    links: [String]
+
+    """ Tags associated with the creator. Max of 12 tags """
+    tags: [String]
+
+    """ Copyright details for the creator """
+    copyright: String
+
+    """ Name to use for contacting the owner of the creator feed """
+    sssOwnerName: String
+
+    """ Email to use for contacting the owner of the creator feed """
+    sssOwnerPublicEmail: String
+
+    """ If the creator has violated Taddy's distribution policies for illegal or harmful content
+    """
+    isBlocked: Boolean
+}
+
+""" InternalCreator details """
+type InternalCreatorRoles {
+    """ Id of the internal creator series"""
+    id: ID
+
+    """ Taddy's unique identifier for the content (an uuid) """
+    contentUuid: ID
+
+    """ Taddy's unique identifier for the creator (an uuid) """
+    creatorUuid: ID
+
+    """ Roles associated with the internal creator."""
+    roles: [ContentRole]
+
+    """ Is the internal creator approved  for the content """
+    isApproved: Boolean
+}
+
+""" InternalCreator details """
+type InternalInvitation {
+    """ Id of the internal creator series"""
+    id: ID
+
+    """ Taddy's unique identifier for the content (an uuid) """
+    contentUuid: ID
+
+    """ Taddy's type for content """
+    contentType: String
+
+    """ Email addresses of the user invited """
+    email: String
+
+    """ Permission """
+    permission: UserPermission
+
+    """ Status of the invitation """
+    status: InvitationStatus
+}
+
+""" Status of Image Optimization Step """
+enum InternalPublishImageStatus {
+    PROCESSING
+    COMPLETE
+}
+
+""" Status of Series """
+enum InternalPublishStatus {
+    DRAFT
+    PUBLISHED
+    SCHEDULED
+}
+
+""" Helpful counts for internal series """
+type InternalSeriesCounts {
+    contentUuid: ID!
+    contentType: String
+    creators: Int
+    issues: Int
+}
+
+""" Types of internal series available on Taddy """
+enum InternalSeriesType {
+    INTERNAL_COMICSERIES
+    INTERNAL_CREATOR
+}
+
+enum InvitationStatus {
+    """ Invitation has been sent """
+    PENDING
+
+    """ Invitation has been accepted """
+    ACCEPTED
+
+    """ Invitation has been expired """
+    EXPIRED
+}
+
+""" iTunes Info for a podcast """
+type iTunesInfo {
+    """ PodcastSeries unique identifier linked to this iTunesInfo """
+    uuid: ID
+
+    """ A different hash signals that itunes information has changed since the last hash
+    """
+    hash: String
+
+    """ Subtitle given in Apple Podcasts """
+    subtitle: String
+
+    """ Summary given in Apple Podcasts """
+    summary: String
+
+    """
+    Base Url to the podcast's cover art from iTunes. NOTE: To get a working image,
+    you need to pass in a size at the end of the url in the format
+    {baseArtworkUrl}{size}x{size}bb.png ex {baseArtworkUrl}640x640bb.png
+    """
+    baseArtworkUrl: String
+
+    """ Helper Url to the podcast's cover art from iTunes. Pass in an interger for the size of the image you want
+    """
+    baseArtworkUrlOf(size: Int): String
+
+    """ Publisher Id from iTunes """
+    publisherId: Int
+
+    """ Publisher name from iTunes """
+    publisherName: String
+
+    """ Country where the podcast is made """
+    country: Country
+
+    """ PodcastSeries linked to this iTunesInfo """
+    podcastSeries: PodcastSeries
+}
+
+""" Languages """
+enum Language {
+    ABKHAZIAN
+    AFAR
+    AFRIKAANS
+    AKAN
+    ALBANIAN
+    AMHARIC
+    ARABIC
+    ARAGONESE
+    ARMENIAN
+    ASSAMESE
+    AVARIC
+    AVESTAN
+    AYMARA
+    AZERBAIJANI
+    BAMBARA
+    BASHKIR
+    BASQUE
+    BELARUSIAN
+    BENGALI
+    BIHARI_LANGUAGES
+    BISLAMA
+    BOSNIAN
+    BRETON
+    BULGARIAN
+    BURMESE
+    CENTRAL_KHMER
+    CHAMORRO
+    CHECHEN
+    CHICHEWA_CHEWA_NYANJA
+    CHINESE
+    CHURCH_SLAVONIC
+    CHUVASH
+    CORNISH
+    CORSICAN
+    CREE
+    CROATIAN
+    CZECH
+    DANISH
+    DHIVEHI_MALDIVIAN
+    DUTCH_FLEMISH
+    DZONGKHA
+    ENGLISH
+    ESPERANTO
+    ESTONIAN
+    EWE
+    FAROESE
+    FARSI
+    FIJIAN
+    FINNISH
+    FRENCH
+    FULAH
+    GAELIC
+    GALICIAN
+    GANDA
+    GEORGIAN
+    GERMAN
+    GIKUYU
+    GREEK
+    GUARANI
+    GUJARATI
+    HAITIAN_CREOLE
+    HAUSA
+    HEBREW
+    HERERO
+    HINDI
+    HIRI_MOTU
+    HUNGARIAN
+    ICELANDIC
+    IDO
+    IGBO
+    INDONESIAN
+    INTERLINGUA
+    INTERLINGUE_OCCIDENTAL
+    INUKTITUT
+    INUPIAQ
+    IRISH
+    ITALIAN
+    JAPANESE
+    JAVANESE
+    KALAALLISUT_GREENLANDIC
+    KANNADA
+    KANURI
+    KASHMIRI
+    KAZAKH
+    KINYARWANDA
+    KOMI
+    KONGO
+    KOREAN
+    KURDISH
+    KWANYAMA
+    KYRGYZ
+    LAO
+    LATIN
+    LATVIAN
+    LETZEBURGESCH
+    LIMBURGISH
+    LINGALA
+    LITHUANIAN
+    LUBA_KATANGA
+    MACEDONIAN
+    MALAGASY
+    MALAY
+    MALAYALAM
+    MALTESE
+    MANX
+    MAORI
+    MARATHI
+    MARSHALLESE
+    MONGOLIAN
+    NAURU
+    NAVAJO
+    NDONGA
+    NEPALI
+    NORTH_NDEBELE
+    NORTHERN_SAMI
+    NORWEGIAN
+    NORWEGIAN_BOKMAL
+    NORWEGIAN_NYNORSK
+    NUOSU_SICHUAN_YI
+    OCCITAN
+    OJIBWA
+    ORIYA
+    OROMO
+    OSSETIAN
+    PALI
+    PASHTO
+    POLISH
+    PORTUGUESE
+    PUNJABI
+    QUECHUA
+    ROMANIAN_MOLDOVAN
+    ROMANSH
+    RUNDI
+    RUSSIAN
+    SAMOAN
+    SANGO
+    SANSKRIT
+    SARDINIAN
+    SERBIAN
+    SHONA
+    SINDHI
+    SINHALA
+    SLOVAK
+    SLOVENIAN
+    SOMALI
+    SOTHO
+    SOUTH_NDEBELE
+    SPANISH
+    SUNDANESE
+    SWAHILI
+    SWATI
+    SWEDISH
+    TAGALOG
+    TAHITIAN
+    TAJIK
+    TAMIL
+    TATAR
+    TELUGU
+    THAI
+    TIBETAN
+    TIGRINYA
+    TONGA
+    TSONGA
+    TSWANA
+    TURKISH
+    TURKMEN
+    TWI
+    UKRAINIAN
+    URDU
+    UYGHUR
+    UZBEK
+    VALENCIAN_CATALAN
+    VENDA
+    VIETNAMESE
+    VOLAPUK
+    WALLOON
+    WELSH
+    WESTERN_FRISIAN
+    WOLOF
+    XHOSA
+    YIDDISH
+    YORUBA
+    ZHUANG
+    ZULU
+}
+
+""" Link Details """
+type LinkDetails {
+    """ The type of link """
+    type: LinkType
+
+    """ The url for the link """
+    url: String
+}
+
+enum LinkType {
+    INSTAGRAM
+    YOUTUBE
+    TIKTOK
+    PATREON
+    EMAIL
+    TWITTER
+    MASTODON
+    FACEBOOK
+    WEBSITE
+    MERCH_STORE
+    TWITCH
+    SNAPCHAT
+    REDDIT
+    DISCORD
+    TELEGRAM
+    PINTEREST
+    TUMBLR
+    SPOTIFY
+    SOUNDCLOUD
+    BANDCAMP
+    VIMEO
+    WECHAT
+    WHATSAPP
+    KO_FI
+    ETSY
+    LINKTREE
+}
+
+""" Please go to https://taddy.org/developers for full documentation of the API
+"""
+type Mutation {
+    generateWebhookEventsFromIds(ids: [String]): [WebhookEvent]
+    addWebhookUrlForUser(endpointUrl: String!, webhookEvents: [String!]!): Webhook
+    updateWebhookForUser(id: ID!, endpointUrl: String!, webhookEvents: [String!]!): Webhook
+    deleteWebhookForUser(id: ID!): ID
+
+    """ Add a new Developer Application """
+    addNewDevApp: DevApp
+    addInternalComicForUser(uuid: ID!, name: String!, description: String!, coverImageUrl: String!, bannerImageUrl: String!, thumbnailImageUrl: String!, genre1: Genre!, genre2: Genre, language: Language!, rating: ContentRating!, tags: [String]): InternalComicSeries
+    updateInternalComicForUser(uuid: ID!, name: String!, description: String!, coverImageUrl: String!, bannerImageUrl: String!, thumbnailImageUrl: String!, genre1: Genre!, genre2: Genre, language: Language!, rating: ContentRating!, tags: [String]): InternalComicSeries
+    deleteInternalComicForUser(uuid: ID!): ID
+    updateStatusForInternalComicSeries(uuid: ID!, status: InternalPublishStatus!): InternalComicSeries
+    addInternalComicIssueForUser(uuid: ID!, seriesUuid: ID!, name: String!, description: String, pushNotificationMessage: String, bannerImageUrl: String, thumbnailImageUrl: String, imageUrls: [String]!, publishAt: String): InternalComicIssue
+    updateInternalComicIssueForUser(uuid: ID!, name: String!, description: String, pushNotificationMessage: String, bannerImageUrl: String, thumbnailImageUrl: String, imageUrls: [String]!, publishAt: String, hasImagesCurrentlyProcessing: Boolean): InternalComicIssue
+    unpublishInternalComicIssueForUser(uuid: ID!): InternalComicIssue
+    deleteInternalComicIssueForUser(uuid: ID!): ID
+    addInternalCreatorForUser(uuid: ID!, name: String!, bio: String, avatarImageUrl: String!, country: Country, links: [String], tags: [String]): InternalCreator
+    updateInternalCreatorForUser(uuid: ID!, name: String!, bio: String, avatarImageUrl: String!, country: Country, links: [String], tags: [String]): InternalCreator
+    deleteInternalCreatorForUser(uuid: ID!): ID
+    updateStatusForInternalCreator(uuid: ID!, status: InternalPublishStatus!): InternalCreator
+    addOrUpdateInternalCreatorRolesForContent(contentUuid: ID!, contentType: String!, creatorUuid: ID!, roles: [ContentRole]!): TeamInternalCreatorRoles
+    addInternalInvitationForContent(contentUuid: ID!, contentType: String!, email: String!, permission: UserPermission!): TeamInternalInvitations
+    expireInternalInvitationForContent(contentUuid: ID!, contentType: String!, id: ID!): TeamInternalInvitations
+
+    """ Add a payment platform for content """
+    addPlatformForContent(contentUuid: ID!, contentType: String!): PlatformDetailsForContent
+}
+
+""" Platform """
+enum Platform {
+    PATREON
+}
+
+""" PlatformDetailsForContent """
+type PlatformDetailsForContent {
+    contentUuid: ID!
+    contentType: String!
+    plans: [PlatformPlan]
+    prices: [PlatformPrice]
+}
+
+""" PlatformPlan """
+type PlatformPlan {
+    id: ID!
+
+    """ The name of the plan """
+    name: String
+
+    """ The description of the plan """
+    description: String
+
+    """ The prices of the plan """
+    prices: [PlatformPrice]
+
+    """ The platform of the plan """
+    platform: Platform
+
+    """ The platform user id """
+    platformUserId: String
+}
+
+""" PlatformPrice """
+type PlatformPrice {
+    id: ID!
+
+    """ The name of the price """
+    name: String
+
+    """ The amount of the price """
+    amountInCents: Int
+
+    """ The currency of the price """
+    currency: String
+
+    """ The interval of the price """
+    interval: PlatformPriceInterval
+
+    """ The platform """
+    platform: Platform
+
+    """ The platform user id """
+    platformUserId: String
+}
+
+""" PlatformPriceInterval """
+enum PlatformPriceInterval {
+    PER_ITEM
+    MONTHLY
+    YEARLY
+}
+
+""" Type of content """
+enum PodcastContentType {
+    AUDIO
+    VIDEO
+}
+
+""" Podcast Episode Details """
+type PodcastEpisode {
+    """ Taddy's unique identifier (an uuid) """
+    uuid: ID
+
+    """ Date when the episode was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The name of an episode """
+    name: String
+
+    """ The description for a episode """
+    description(
+        """
+        (Optional) Option to remove the html tags from the description or leave the
+        description as is (which might include html tags). Default is false (do not
+        strip html tags from description).
+        """
+        shouldStripHtmlTags: Boolean
+    ): String
+
+    """ Cover Art for the episode (it may be different than podcast cover art)
+    """
+    imageUrl: String
+
+    """ A different hash means that details for this episode have updated since the last hash
+    """
+    hash: String
+
+    """ An episode's unique identifier from its RSS feed """
+    guid: String
+
+    """ The subtitle of an episode (shorter version of episode description, limited to 255 characters long)
+    """
+    subtitle: String
+
+    """ Link to Audio Content for the episode"""
+    audioUrl: String
+
+    """ Link to Video Content for the episode"""
+    videoUrl: String
+
+    """ File Length of Content """
+    fileLength: Int
+
+    """ Exact File Type of Content """
+    fileType: String
+
+    """ Duration of Content (in seconds) """
+    duration: Int
+
+    """ Episode Type ie) trailer, bonus or full """
+    episodeType: PodcastEpisodeType
+
+    """ Season Number (if provided) """
+    seasonNumber: Int
+
+    """ Episode Number (if provided) """
+    episodeNumber: Int
+
+    """ Website Link for episode """
+    websiteUrl: String
+
+    """ If the episode contain's explicit content """
+    isExplicitContent: Boolean
+
+    """ If the episode has now been removed from the RSS Feed """
+    isRemoved: Boolean
+
+    """
+    If the content has violated Taddy's distribution policies for illegal or
+    harmful content it will be blocked from getting any updates
+    """
+    isBlocked: Boolean
+
+    """ Details on the podcast for which this episode belongs to """
+    podcastSeries: PodcastSeries
+}
+
+""" Type of episodes (trailer, bonus, full) """
+enum PodcastEpisodeType {
+    TRAILER
+    BONUS
+    FULL
+}
+
+""" Podcast Details """
+type PodcastSeries {
+    """ Taddy's unique identifier (an uuid) """
+    uuid: ID
+
+    """ Date when the podcast was published (Epoch time in seconds) """
+    datePublished: Int
+
+    """ The name (title) for a podcast """
+    name: String
+
+    """ The description for a podcast """
+    description(
+        """
+        (Optional) Option to remove the html tags from the description or leave the
+        description as is (which may include html tags). Default is false (leave
+        description as is).
+        """
+        shouldStripHtmlTags: Boolean
+    ): String
+
+    """ The cover art for a podcast """
+    imageUrl: String
+
+    """ itunesId for the podcast """
+    itunesId: Int
+
+    """
+    A hash of all podcast details. It may be useful for you to save this property
+    in your database and compare it to know if any podcast details have updated
+    since the last time you checked
+    """
+    hash: String
+
+    """
+    A hash of all episode details. It may be useful for you to save this property
+    in your database and compare it to know if there are any new or updated
+    episodes since the last time you checked
+    """
+    childrenHash: String
+
+    """ A list of episodes for this podcast """
+    episodes(
+        """
+        (Optional) Returns episodes based on SortOrder. Default is LATEST (newest
+        episodes first), another option is OLDEST (oldest episodes first), and
+        another option is SEARCH (pass in the property searchTerm) to filter for
+        episodes by title or description.
+        """
+        sortOrder: SortOrder
+
+        """ (Optional) Taddy paginates the results returned. Default is 1, Max value allowed is 1000
+        """
+        page: Int
+
+        """ (Optional) Return up to this number of episodes. Default is 10, Max value allowed is 25 results per page
+        """
+        limitPerPage: Int
+
+        """
+        (Optional) Only to be used when sortOrder is SEARCH. Filters through the
+        title & description of episodes for the searchTerm
+        """
+        searchTerm: String
+
+        """
+        (Optional) The option to show episodes that were once on the RSS feed but
+        have now been removed. Default is false (do not include removed episodes)
+        """
+        includeRemovedEpisodes: Boolean
+    ): [PodcastEpisode]
+
+    """ The number of episodes for this podcast """
+    totalEpisodesCount(
+        """
+        (Optional) Option to include episodes that were once on the RSS feed but
+        have now been removed. Default is false (do not include removed episodes)
+        """
+        includeRemovedEpisodes: Boolean
+    ): Int
+
+    """ A podcast can belong to multiple genres but they are listed in order of importance. Limit of 5 genres per podcast
+    """
+    genres: [Genre]
+
+    """ Additional info from itunes on the podcast """
+    itunesInfo: iTunesInfo
+
+    """ Podcast type (serial or episodic) """
+    seriesType: PodcastSeriesType
+
+    """ Language spoken on the podcast """
+    language: Language
+
+    """ Podcast's Content Type (Is the podcast primarily an Audio or Video Podcast)
+    """
+    contentType: PodcastContentType
+
+    """ Boolean for if the podcast contain's explicit content """
+    isExplicitContent: Boolean
+
+    """ Copyright details for the podcast """
+    copyright: String
+
+    """ The podcast's website """
+    websiteUrl: String
+
+    """ Url for the podcast's RSS feed """
+    rssUrl: String
+
+    """ Name to use for contacting the owner of this podcast feed """
+    rssOwnerName: String
+
+    """ Email to use for contacting the owner of this podcast feed """
+    rssOwnerPublicEmail: String
+
+    """ Name of the Podcast creator (the podcast creator and the owner of the podcast feed can be different)
+    """
+    authorName: String
+
+    """ Details on how often the podcast is checked for new episodes """
+    feedRefreshDetails: FeedRefreshDetails
+
+    """ If the podcast is finished / complete """
+    isCompleted: Boolean
+
+    """ (OLD / WILL BE DEPRECATED) If the podcast is finished / complete """
+    isComplete: Boolean
+
+    """
+    If the content has violated Taddy's distribution policies for illegal or
+    harmful content it will be blocked from getting any updates
+    """
+    isBlocked: Boolean
+}
+
+""" Type of podcast """
+enum PodcastSeriesType {
+    SERIAL
+    EPISODIC
+}
+
+""" Please go to https://taddy.org/developers for full documentation of the API
+"""
+type Query {
+    """ Get details on a Podcast """
+    getPodcastSeries(
+        """ Get a podcast by its unique identifier (uuid) """
+        uuid: ID
+
+        """ Get a podcast by its itunesId """
+        itunesId: Int
+
+        """ Get a podcast by its rssFeed url """
+        rssUrl: String
+
+        """ Get a podcast by its name """
+        name: String
+    ): PodcastSeries
+
+    """ Get details on multiple podcasts """
+    getMultiplePodcastSeries(
+        """ An Array of taddy's unique identifier (uuid). Max 25 IDs allowed """
+        uuids: [ID]
+    ): [PodcastSeries]
+
+    """ Get details on a podcast episode"""
+    getPodcastEpisode(
+        """ Taddy's unique identifier (uuid) """
+        uuid: ID
+
+        """ An episode's guid (from its RSS Feed) """
+        guid: String
+
+        """
+        The name (title) of a episode. Note: Multiple episodes can have the exact
+        same name, in that case we always try to return the most popular podcast
+        (based on infomation we have on the subscriber count)
+        """
+        name: String
+    ): PodcastEpisode
+
+    """ Get details on multiple podcast episodes"""
+    getMultiplePodcastEpisodes(
+        """ An Array of taddy's unique identifier (uuid). Max 25 IDs allowed """
+        uuids: [ID]
+    ): [PodcastEpisode]
+
+    """ Get details on a Comic """
+    getComicSeries(
+        """ Get a comic by its unique identifier (uuid) """
+        uuid: ID
+
+        """ Get a comic by its sssFeed url """
+        sssUrl: String
+
+        """ Get a comic by its name """
+        name: String
+    ): ComicSeries
+
+    """ Get details on multiple comics """
+    getMultipleComicSeries(
+        """ An Array of taddy's unique identifier (uuid). Max 25 IDs allowed """
+        uuids: [ID]
+    ): [ComicSeries]
+
+    """ Get details on a comic issue"""
+    getComicIssue(
+        """ Unique identifier for a comic issue """
+        uuid: ID
+
+        """
+        The name (title) of an issue. Note: Multiple issues can have the exact same
+        name, in that case we always try to return the most popular comic (based on
+        infomation we have on the subscriber count)
+        """
+        name: String
+    ): ComicIssue
+
+    """ Get details on multiple comic issues """
+    getMultipleComicIssues(
+        """ An Array of unique identifiers (uuid). Max 25 IDs allowed """
+        uuids: [ID]
+    ): [ComicIssue]
+
+    """ Get details on a comic story"""
+    getComicStory(
+        """ Unique identifier for a comic story """
+        uuid: ID
+    ): ComicStory
+
+    """ Get details on multiple comic stories """
+    getMultipleComicStories(
+        """ An Array of unique identifiers (uuid). Max 25 IDs allowed """
+        uuids: [ID]
+    ): [ComicStory]
+
+    """ Get details on a Creator """
+    getCreator(
+        """ Get a creator by its unique identifier (uuid) """
+        uuid: ID
+
+        """ Get a creator by its sssFeed url """
+        sssUrl: String
+
+        """ Get a creator by its name """
+        name: String
+    ): Creator
+
+    """ Get details on multiple creators """
+    getMultipleCreators(
+        """ An Array of unique identifiers (uuid). Max 25 IDs allowed """
+        uuids: [ID]
+    ): [Creator]
+
+    """ Get details on a Creator """
+    getCreatorContent(
+        """ Get creatorcontent by its unique identifier (uuid) """
+        uuid: ID
+    ): CreatorContent
+
+    """ Get Search results details for a term """
+    searchForTerm(
+        """ (Required) The term you are searching for """
+        term: String
+
+        """ (Optional) Allows for pagination. Default is 1 (ie: page 1 of the results). Max value is 20.
+        """
+        page: Int
+
+        """
+        (Optional) The number of results per page. Default is 10. Max value is 25
+        (ie: that max results you can return in one query in 25)
+        """
+        limitPerPage: Int
+
+        """
+        (Optional) Sort results by date content was published. Default is to ignore
+        date but match search by terms passed in. Possible values are LATEST or OLDEST.
+        """
+        sortByDatePublished: SortOrder
+
+        """ (Optional) Filter for only certain content types  """
+        filterForTypes: [TaddyType]
+
+        """ (Optional) Filter for only content made in certain countries """
+        filterForCountries: [Country]
+
+        """ (Optional) Filter for only content made in certain languages """
+        filterForLanguages: [Language]
+
+        """ (Optional) Filter for only content from certain genres """
+        filterForGenres: [Genre]
+
+        """ (Optional) Filter for only content that includes a certain tag """
+        filterForTags: [String]
+
+        """ (Optional) Filter for only content that has a certain content rating. For PODCASTSERIES & PODCASTEPISODE use isSafeMode
+        """
+        filterForContentRatings: [ContentRating]
+
+        """ (Optional - only when type is CREATOR) Filter for only creators with a specific role in creating the content
+        """
+        filterForContentRoles: [ContentRole]
+
+        """ (Optional) Filter for results only from certain series """
+        filterForSeriesUuids: [ID]
+
+        """ (Optional) Filter for results that are not from certain series """
+        filterForNotInSeriesUuids: [ID]
+
+        """ (Optional) Filter for results that are published after a certain date (Epoch time in seconds)
+        """
+        filterForPublishedAfter: Int
+
+        """ (Optional) Filter for results that are published before a certain date (Epoch time in seconds)
+        """
+        filterForPublishedBefore: Int
+
+        """
+        (Optional) Use this to expand search results. Without SearchOperator, our
+        API only searches for the exact phrase, using an AND or OR SearchOperator
+        will expand the search to include any or all the terms passed in.
+        """
+        includeSearchOperator: SearchOperator
+
+        """
+        (Optional - only when type is PODCASTSERIES or PODCASTEPISODE) Choose to
+        only return safe (not explicit) content or all content. Default is false
+        (include everything, including explicit content)
+        """
+        isSafeMode: Boolean
+
+        """
+        (Optional) By default your search will score an exact match of a content's
+        title as most relevant, if you care more about getting back popular content
+        than getting an exact match choose BOOST_POPULARITY_A_LOT or
+        BOOST_POPULARITY_A_LITTLE
+        """
+        searchResultsBoostType: SearchResultBoostType
+    ): SearchResults
+
+    """ Get documentation """
+    getDocumenation(
+        """ Get documentation by its id """
+        id: ID!
+    ): Documentation
+
+    """ Get your Developer Applications """
+    getMyDeveloperApplications(limit: Int): UserDevApps
+
+    """ Get your Developer Applications """
+    getMyDeveloperWebhooks(limit: Int): UserWebhooks
+
+    """ Get your User Details"""
+    me: User
+
+    """ Get details on a Podcast """
+    getItunesInfo(
+        """ Get ItunesInfo on a podcast by the podcast's unique identifier (uuid)
+        """
+        uuid: ID
+
+        """ Get ItunesInfo on a podcast by the podcast's itunesId """
+        itunesId: Int
+    ): iTunesInfo
+
+    """ Get details on all your internal series """
+    getMyInternalSeries(
+        """ filter for specific types of series """
+        filterForTypes: [InternalSeriesType]
+    ): UserInternalSeriesList
+
+    """ Get details on a specifc internal series """
+    getPreviewDetailsForSeries(contentUuid: ID!, contentType: String!): ContentInternalSeriesList
+
+    """ Get details on all your internal series """
+    getInternalComicForUser(uuid: ID!): InternalComicSeries
+
+    """ Get details on a internal comic issue """
+    getInternalComicIssue(uuid: ID!, seriesUuid: ID!): InternalComicIssue
+
+    """ Get Internal Creator """
+    getInternalCreatorForUser(uuid: ID!, permissionType: String): InternalCreator
+
+    """ Get Internal Creators """
+    getInternalCreatorsForUser(permissionType: String): [InternalCreator]
+
+    """ Get Internal Creators """
+    getInternalCreatorsForContent(contentUuid: ID!, contentType: String!): [InternalCreator]
+
+    """ Get details on all your internal series """
+    getInternalCreatorRolesForContent(
+        """ The content uuid """
+        contentUuid: ID
+
+        """ The content type """
+        contentType: String
+    ): TeamInternalCreatorRoles
+
+    """ Get details on all your internal series """
+    getInternalInvitationsForContent(
+        """ The content uuid """
+        contentUuid: ID
+
+        """ The content type """
+        contentType: String
+    ): TeamInternalInvitations
+
+    """ Get your Developer Applications """
+    getPermissionForItem(uuid: ID!, taddyType: String!): UserPermission
+
+    """ Get details on a webtoons series """
+    getWebtoonsSeriesData(url: String!): WebtoonSeriesData
+
+    """ Get platform options connected for content """
+    getPlatformsForContent(contentUuid: ID!, contentType: String!): PlatformDetailsForContent
+}
+
+enum SearchOperator {
+    AND
+    OR
+}
+
+type SearchQueryResponseInfo {
+    """ Identifier for the search query being sent """
+    searchId: ID!
+
+    """
+    The number of milliseconds the uncached query took to search for results. If
+    this query is already cached, this is immediately returned.
+    """
+    took: Int
+
+    """ Counts of each item type returned in the search results """
+    responseInfoDetails: [SearchQueryResponseInfoDetails]
+}
+
+type SearchQueryResponseInfoDetails {
+    """ Identifier for the search query being sent """
+    searchId: ID!
+
+    """ The type of item being returned in the search results """
+    type: TaddyType
+
+    """ Total number of search results returned for this type """
+    totalCount: Int
+
+    """ Total number of pages of results returned for this type """
+    pagesCount: Int
+}
+
+enum SearchResultBoostType {
+    BOOST_EXACT_TERM
+    BOOST_POPULARITY_A_LOT
+    BOOST_POPULARITY_A_LITTLE
+}
+
+""" Search results """
+type SearchResults {
+    """ Identifier for the search query being sent """
+    searchId: ID!
+
+    """ A list of PodcastSeries items """
+    podcastSeries: [PodcastSeries]
+
+    """ A list of PodcastEpisode items """
+    podcastEpisodes: [PodcastEpisode]
+
+    """ A list of ComicSeries items """
+    comicSeries: [ComicSeries]
+
+    """ A list of ComicIssue items """
+    comicIssues: [ComicIssue]
+
+    """ A list of Creator items """
+    creators: [Creator]
+
+    """ Additional information on the search results being returned """
+    queryResponseInfo: SearchQueryResponseInfo
+}
+
+""" Different Sort orders """
+enum SortOrder {
+    LATEST
+    OLDEST
+    SEARCH
+}
+
+""" Types of media available on Taddy """
+enum TaddyType {
+    PODCASTSERIES
+    PODCASTEPISODE
+    COMICSERIES
+    COMICISSUE
+    CREATOR
+}
+
+""" Details on roles for a piece of content """
+type TeamInternalCreatorRoles {
+    """ Taddy's unique identifier for the content (an uuid) """
+    contentUuid: ID
+
+    """ Taddy Type for content """
+    contentType: String
+
+    """ List of internal creator roles """
+    creatorRoles: [InternalCreatorRoles]
+
+    """ List of creator """
+    internalCreators: [InternalCreator]
+}
+
+""" TeamInternalInvitations details """
+type TeamInternalInvitations {
+    """ Taddy's unique identifier for the content (an uuid) """
+    contentUuid: ID
+
+    """ Taddy's type for content """
+    contentType: String
+
+    """ Outstanding  """
+    invitations: [InternalInvitation]
+}
+
+""" User Details """
+type User {
+    """ The user id"""
+    id: ID
+    myDeveloperDetails: UserDeveloperDetails
+    myDeveloperBillingPlanDetails: UserDeveloperBillingPlanDetails
+}
+
+""" User Details for Developer Application Details """
+type UserDevApps {
+    """ The user id for the dev app"""
+    userId: ID
+
+    """ A list of all the dev Apps for a user"""
+    devApps: [DevApp]
+}
+
+""" Developer Billling Plan Details """
+type UserDeveloperBillingPlanDetails {
+    userId: ID
+    currentPeriodEnd: Float
+    cancelAt: Float
+    primaryProduct: String
+    addons: [String]
+}
+
+""" User Developer Details """
+type UserDeveloperDetails {
+    userId: ID
+    currentApiUsage: Int
+    allowedApiCallsLimit: Int
+    allowedDevAppsLimit: Int
+    allowedWebhookLimit: Int
+}
+
+""" Details on all internal series """
+type UserInternalSeriesList {
+    """ The user id"""
+    userId: ID
+
+    """ List of internal comic series """
+    internalcomicseries: [InternalComicSeries]
+
+    """ List of creator feeds """
+    internalcreators: [InternalCreator]
+}
+
+""" Permission on Taddy """
+enum UserPermission {
+    OWNER
+    ADMIN
+    CONTRIBUTOR
+    VIEWER
+}
+
+""" User Details for Developer Application Details """
+type UserWebhooks {
+    """ The user id for the dev app"""
+    userId: ID
+
+    """ A list of all the dev Apps for a user"""
+    webhooks: [Webhook]
+}
+
+""" Webhook Details """
+type Webhook {
+    """ The unique identifier for the webhook """
+    id: ID!
+
+    """ Date created (Epoch time in seconds) """
+    createdAt: Int
+
+    """ User that created the webhook """
+    user: User
+
+    """ URL for the webhook """
+    endpointUrl: String
+
+    """ Secret for the webhook """
+    webhookSecret: String
+
+    """If the webhook is verified or not"""
+    isVerified: Boolean
+
+    """If the webhook is active or not"""
+    isActive: Boolean
+
+    """Events that get triggered for the webhook"""
+    events: [String]
+}
+
+""" WebhookEvent Details """
+type WebhookEvent {
+    uuid: ID
+    action: WebhookEventActionType
+    taddyType: String
+    timestamp: Float
+    podcastSeries: PodcastSeries
+    podcastEpisode: PodcastEpisode
+    itunesInfo: iTunesInfo
+}
+
+""" Type of webhook action """
+enum WebhookEventActionType {
+    created
+    updated
+    deleted
+    new_episodes_released
+}
+
+""" Websub Details """
+type WebsubDetails {
+    """ Taddy's unique identifier """
+    uuid: ID
+
+    """ The feed url for the websub """
+    topicUrl: String
+
+    """ The url for the hub where you get the websub notification """
+    websubHubUrl: String
+
+    """ If the websub notification is currently active """
+    isVerified: Boolean
+}
+
+""" Details Webtoons on a webtoons comic so that they can be imported into Taddy
+"""
+type WebtoonSeriesData {
+    """ Id"""
+    id: ID
+
+    """ The name (title) for a comic """
+    name: String
+
+    """ The description for a comic """
+    description: String
+
+    """ A main genre for the comic """
+    genre1: Genre
+
+    """ The secondary genre for the comic """
+    genre2: Genre
+
+    """ Language spoken on the comic """
+    language: Language
+}
