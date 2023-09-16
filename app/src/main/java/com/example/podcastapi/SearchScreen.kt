@@ -12,10 +12,11 @@ import androidx.compose.ui.unit.dp
 import com.apollographql.apollo3.exception.ApolloException
 import com.example.podcastapi.SearchForTermQuery
 import com.example.podcastapi.SearchForTermQuery as SearchQuery
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navController: NavController) {
     var query by remember { mutableStateOf("") }
     var state by remember { mutableStateOf<SearchState>(SearchState.Empty) }
     val scope = rememberCoroutineScope()
@@ -56,6 +57,16 @@ fun SearchScreen() {
         }) {
             Text(text = "Search")
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = {
+            navController.navigate("about")
+        }) {
+            Text(text = "Go to About")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         when (val s = state) {
             SearchState.Loading -> CircularProgressIndicator()
