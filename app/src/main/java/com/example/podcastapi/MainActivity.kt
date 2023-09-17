@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
                             SearchScreen(navController)
                         }
                         composable("about") {
-                            AboutScreen()
+                            AboutScreen(navController)
                         }
                     }
                 }
