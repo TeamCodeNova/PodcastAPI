@@ -12,19 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PodcastAPI"
         tools:targetApi="31">
-
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.PodcastAPI">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Declare PodcastDetailActivity -->
-        <activity android:name=".PodcastDetailActivity" android:exported="false"/>
-
     </application>
 
 </manifest>
