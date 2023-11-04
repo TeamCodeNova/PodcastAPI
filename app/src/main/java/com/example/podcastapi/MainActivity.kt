@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import com.example.podcastapi.ui.theme.PodcastAPITheme
 import androidx.compose.ui.Modifier
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,5 +20,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+    fun dbExists(args: Array<String>)
+    {
+//        var filename = "../../../../../data/podcast_db.sqlite"
+//        var file = File(filename)
+//        var fileExists = file.exists()
+//
+//        if(fileExists){
+//            //Do nothing
+//        } else {
+//            var isCreated = file.createNewFile()
+//            if (isCreated)
+//
+//            else
+//                println("File is not created")
+//        }
     }
 }
