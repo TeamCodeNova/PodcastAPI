@@ -11,7 +11,7 @@ data class PodcastModel (
     var podcastLanguage: String,
     var latestReleaseDate: String,
     var publishedDate: String,
-    var contentType: String,
+    var genre: String,
     var isComplete: String,
     var isExplicit: String
 )

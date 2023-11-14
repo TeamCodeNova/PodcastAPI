@@ -22,7 +22,7 @@ class DBHandler // creating a constructor for our database handler.
                 + LANGUAGE_COL + " TEXT,"
                 + LATEST_RELEASE_DATE_COL + " DATE,"
                 + PUBLISHED_DATE_COL + " DATE,"
-                + CONTENT_TYPE_COL + " TEXT,"
+                + GENRE_COL + " TEXT,"
                 + IS_COMPLETE_COL + " TEXT,"
                 + IS_EXPLICIT_COL + " TEXT)")
 
@@ -31,7 +31,7 @@ class DBHandler // creating a constructor for our database handler.
     }
 
     // this method is use to add new course to our sqlite database.
-    fun addNewCourse(
+    fun addNewPodcast(
         id: Int,
         podcastDescription: String,
         podcastUrl: String,
@@ -40,7 +40,7 @@ class DBHandler // creating a constructor for our database handler.
         podcastLanguage: String,
         latestReleaseDate: String,
         publishedDate: String,
-        contentType: String,
+        genre: String,
         isComplete: String,
         isExplicit: String
     ) {
@@ -61,7 +61,7 @@ class DBHandler // creating a constructor for our database handler.
         values.put(LANGUAGE_COL, podcastLanguage)
         values.put(LATEST_RELEASE_DATE_COL, latestReleaseDate)
         values.put(PUBLISHED_DATE_COL, publishedDate)
-        values.put(CONTENT_TYPE_COL, contentType)
+        values.put(GENRE_COL, genre)
         values.put(IS_COMPLETE_COL, isComplete)
         values.put(IS_EXPLICIT_COL, isExplicit)
         // after adding all values we are passing
@@ -81,7 +81,7 @@ class DBHandler // creating a constructor for our database handler.
     companion object {
         // creating a constant variables for our database.
         // below variable is for our database name.
-        private const val DB_NAME = "podcastDb"
+        private const val DB_NAME = "podcast"
 
         // below int is our database version
         private const val DB_VERSION = 1
@@ -107,7 +107,7 @@ class DBHandler // creating a constructor for our database handler.
 
         private const val PUBLISHED_DATE_COL = "published_date"
 
-        private const val CONTENT_TYPE_COL = "content_type"
+        private const val GENRE_COL = "genre"
         
         private const val IS_COMPLETE_COL = "is_complete"
 
