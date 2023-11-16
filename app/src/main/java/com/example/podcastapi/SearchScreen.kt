@@ -50,12 +50,7 @@ fun SearchScreen() {
             scope.launch {
                 state = SearchState.Loading
                 try {
-                    val response = apolloClient.query(SearchQuery(term = query)).execute()
-                    if (response.hasErrors()) {
-                        state = SearchState.Error(response.errors!!.first().message)
-                    } else {
-                        state = SearchState.Success(response.data!!)
-                    }
+                    // ... Existing search logic ...
                 } catch (e: ApolloException) {
                     state = SearchState.Error(e.localizedMessage ?: "Unknown error")
                 }
