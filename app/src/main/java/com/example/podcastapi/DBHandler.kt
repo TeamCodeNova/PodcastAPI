@@ -4,6 +4,7 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.podcastapi.PodcastModel
+import android.util.Log
 
 class DBHandler // creating a constructor for our database handler.
     (context: Context?) :
@@ -76,6 +77,13 @@ class DBHandler // creating a constructor for our database handler.
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
         onCreate(db)
     }
+    fun deleteDatabase()
+    {
+        val db = this.writableDatabase
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db)
+    }
+
 
     companion object {
         // creating a constant variables for our database.
@@ -158,5 +166,26 @@ class DBHandler // creating a constructor for our database handler.
         // at last closing our cursor and returning our array list.
         cursorPodcasts.close()
         return PodcastModelArrayList
+    }
+    fun logPodcasts(context: Context)
+    {
+        Log.v("dbTest","Locating DB");
+        lateinit var podcastList: List<PodcastModel>
+        podcastList = ArrayList<PodcastModel>()
+
+        podcastList = readPodcasts()!!
+        if(podcastList.isNotEmpty()) {
+            Log.v("dbTest","Printing DB $podcastList");
+
+            for(item in podcastList){
+                Log.v("dbTest", "$item");
+            }
+        }
+        else
+        {
+            Log.v("dbTest","Error: No items in DB");
+        }
+
+
     }
 }

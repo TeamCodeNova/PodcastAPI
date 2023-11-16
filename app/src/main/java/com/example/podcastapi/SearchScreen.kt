@@ -1,5 +1,8 @@
 package com.example.podcastapi
 
+import DBHandler
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -13,12 +16,18 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.example.podcastapi.SearchForTermQuery
 import com.example.podcastapi.SearchForTermQuery as SearchQuery
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt //For rand
+import kotlin.random.Random
+import android.util.Log
+
 
 @Composable
 fun SearchScreen() {
     var query by remember { mutableStateOf("") }
     var state by remember { mutableStateOf<SearchState>(SearchState.Empty) }
     val scope = rememberCoroutineScope()
+
+    TestDB(LocalContext.current);
 
     Column(
         modifier = Modifier
@@ -65,7 +74,20 @@ fun SearchScreen() {
         }
     }
 }
+fun TestDB(context: Context)
+{
+    lateinit var PodcastList: List<PodcastModel>
+    PodcastList = ArrayList<PodcastModel>()
 
+    val dbHandler: DBHandler = DBHandler(context);
+    var rand = Random.nextInt(89999) + 10000;
+    var episodeCount  = Random.nextInt(50) + 1;
+    rand = rand.toInt();
+    Log.v("random", "$rand");
+    //dbHandler.deleteDatabase();
+    dbHandler.addNewPodcast(rand, "Test item $rand", "url", "Kyle's Test random", episodeCount, "English", "2023-11-16","2023-11-16", "Art", "true", "true"  )
+    dbHandler.logPodcasts(context);
+}
 @Composable
 fun PodcastList(data: List<SearchForTermQuery.PodcastSeries?>?) {
     data?.let {
