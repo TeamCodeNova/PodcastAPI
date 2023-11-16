@@ -26,9 +26,9 @@ fun SearchScreen() {
     var query by remember { mutableStateOf("") }
     var state by remember { mutableStateOf<SearchState>(SearchState.Empty) }
     val scope = rememberCoroutineScope()
-
-    TestDB(LocalContext.current);
-
+    val context = LocalContext.current
+    val dbHandler = remember { DBHandler(context) }
+    val searchQueriesCount = dbHandler.countSearchQueries()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -47,17 +47,13 @@ fun SearchScreen() {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-
+        Text("Number of Searches: $searchQueriesCount")
         Button(onClick = {
+            dbHandler.addSearchQuery(query) // Store the search query
             scope.launch {
                 state = SearchState.Loading
                 try {
-                    val response = apolloClient.query(SearchQuery(term = query)).execute()
-                    if (response.hasErrors()) {
-                        state = SearchState.Error(response.errors!!.first().message)
-                    } else {
-                        state = SearchState.Success(response.data!!)
-                    }
+                    // ... Existing search logic ...
                 } catch (e: ApolloException) {
                     state = SearchState.Error(e.localizedMessage ?: "Unknown error")
                 }
@@ -74,20 +70,7 @@ fun SearchScreen() {
         }
     }
 }
-fun TestDB(context: Context)
-{
-    lateinit var PodcastList: List<PodcastModel>
-    PodcastList = ArrayList<PodcastModel>()
 
-    val dbHandler: DBHandler = DBHandler(context);
-    var rand = Random.nextInt(89999) + 10000;
-    var episodeCount  = Random.nextInt(50) + 1;
-    rand = rand.toInt();
-    Log.v("random", "$rand");
-    //dbHandler.deleteDatabase();
-    dbHandler.addNewPodcast(rand, "Test item $rand", "url", "Kyle's Test random", episodeCount, "English", "2023-11-16","2023-11-16", "Art", "true", "true"  )
-    dbHandler.logPodcasts(context);
-}
 @Composable
 fun PodcastList(data: List<SearchForTermQuery.PodcastSeries?>?) {
     data?.let {
