@@ -20,8 +20,8 @@ class DBHandler // creating a constructor for our database handler.
                 + AUTHOR_COL + " TEXT,"
                 + EPISODES_COL + " INT,"
                 + LANGUAGE_COL + " TEXT,"
-                + LATEST_RELEASE_DATE_COL + " DATE,"
-                + PUBLISHED_DATE_COL + " DATE,"
+                + LATEST_RELEASE_DATE_COL + " TEXT,"
+                + PUBLISHED_DATE_COL + " TEXT,"
                 + GENRE_COL + " TEXT,"
                 + IS_COMPLETE_COL + " TEXT,"
                 + IS_EXPLICIT_COL + " TEXT)")
@@ -147,8 +147,8 @@ class DBHandler // creating a constructor for our database handler.
                 // on below line we are adding the data from cursor to our array list.
                 PodcastModelArrayList.add(
                     PodcastModel(
-                        cursorPodcasts.getInt(1),
-                        cursorPodcasts.getString(4),
+                        cursorPodcasts.getInt(0),
+                        cursorPodcasts.getString(1),
                         cursorPodcasts.getString(2),
                         cursorPodcasts.getString(3),
                         cursorPodcasts.getInt(4),
@@ -157,7 +157,8 @@ class DBHandler // creating a constructor for our database handler.
                         cursorPodcasts.getString(7),
                         cursorPodcasts.getString(8),
                         cursorPodcasts.getString(9),
-                        cursorPodcasts.getString(10)
+                        cursorPodcasts.getString(10),
+
                     )
                 )
             } while (cursorPodcasts.moveToNext())
