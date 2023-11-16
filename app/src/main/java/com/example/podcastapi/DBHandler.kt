@@ -4,7 +4,6 @@ import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.podcastapi.PodcastModel
-import java.util.Date
 
 class DBHandler // creating a constructor for our database handler.
     (context: Context?) :
@@ -14,7 +13,7 @@ class DBHandler // creating a constructor for our database handler.
         // on below line we are creating an sqlite query and we are
         // setting our column names along with their data types.
         val query = ("CREATE TABLE " + TABLE_NAME + " ("
-                + ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + ID_COL + " INTEGER PRIMARY KEY, " // Id is grabbed from the api
                 + DESCRIPTION_COL + " TEXT,"
                 + URL_COL + " TEXT,"
                 + AUTHOR_COL + " TEXT,"
@@ -30,7 +29,7 @@ class DBHandler // creating a constructor for our database handler.
         db.execSQL(query)
     }
 
-    // this method is use to add new course to our sqlite database.
+    // this method is use to add new podcasts to our sqlite database.
     fun addNewPodcast(
         id: Int,
         podcastDescription: String,
@@ -92,63 +91,72 @@ class DBHandler // creating a constructor for our database handler.
         // below variable is for our id column.
         private const val ID_COL = "id"
 
-        // below variable for our course description column.
+        // below variable for our podcast's description column.
         private const val DESCRIPTION_COL = "description"
 
+        // below variable is for our podcast url column
         private const val URL_COL = "url"
 
+        // below variable is for our podcast's author column
         private const val AUTHOR_COL = "author_name"
 
+        // below variable is for our podcast's episode count
         private const val EPISODES_COL = "episodes_count"
 
+        // below variable is for our language column
         private const val LANGUAGE_COL = "podcast_language"
 
+        // below variable is for our podcasts latest release date column
         private const val LATEST_RELEASE_DATE_COL = "latest_release_date"
 
+        // below variable is for our podcasts published date column
         private const val PUBLISHED_DATE_COL = "published_date"
 
+        // below variable is for our podcasts genre(s) column
         private const val GENRE_COL = "genre"
-        
+
+        // below variable is for if our podcast is completed column
         private const val IS_COMPLETE_COL = "is_complete"
 
+        // below variable is for if our podcast is explicit column
         private const val IS_EXPLICIT_COL = "is_explicit"
     }
 
-    // we have created a new method for reading all the courses.
-    fun readCourses(): ArrayList<PodcastModel>? {
+    // gets data from db and outputs it as an ArrayList
+    fun readPodcasts(): ArrayList<PodcastModel>? {
         // on below line we are creating a database for reading our database.
         val db = this.readableDatabase
 
         // on below line we are creating a cursor with query to read data from database.
-        val cursorCourses: Cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
+        val cursorPodcasts: Cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
 
         // on below line we are creating a new array list.
-        val courseModelArrayList: ArrayList<PodcastModel> = ArrayList()
+        val PodcastModelArrayList: ArrayList<PodcastModel> = ArrayList()
 
         // moving our cursor to first position.
-        if (cursorCourses.moveToFirst()) {
+        if (cursorPodcasts.moveToFirst()) {
             do {
                 // on below line we are adding the data from cursor to our array list.
-                courseModelArrayList.add(
+                PodcastModelArrayList.add(
                     PodcastModel(
-                        cursorCourses.getInt(1),
-                        cursorCourses.getString(4),
-                        cursorCourses.getString(2),
-                        cursorCourses.getString(3),
-                        cursorCourses.getInt(4),
-                        cursorCourses.getString(5),
-                        cursorCourses.getString(6),
-                        cursorCourses.getString(7),
-                        cursorCourses.getString(8),
-                        cursorCourses.getString(9),
-                        cursorCourses.getString(10)
+                        cursorPodcasts.getInt(1),
+                        cursorPodcasts.getString(4),
+                        cursorPodcasts.getString(2),
+                        cursorPodcasts.getString(3),
+                        cursorPodcasts.getInt(4),
+                        cursorPodcasts.getString(5),
+                        cursorPodcasts.getString(6),
+                        cursorPodcasts.getString(7),
+                        cursorPodcasts.getString(8),
+                        cursorPodcasts.getString(9),
+                        cursorPodcasts.getString(10)
                     )
                 )
-            } while (cursorCourses.moveToNext())
+            } while (cursorPodcasts.moveToNext())
             // moving our cursor to next.
         }
         // at last closing our cursor and returning our array list.
-        cursorCourses.close()
-        return courseModelArrayList
+        cursorPodcasts.close()
+        return PodcastModelArrayList
     }
 }
