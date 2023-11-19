@@ -12,11 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.apollographql.apollo3.exception.ApolloException
-import com.example.podcastapi.SearchForTermQuery
 import com.example.podcastapi.SearchForTermQuery as SearchQuery
 import kotlinx.coroutines.launch
-
-
 
 @Composable
 fun SearchScreen() {
@@ -25,7 +22,7 @@ fun SearchScreen() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dbHandler = remember { DBHandler(context) }
-    val searchQueriesCount = dbHandler.countSearchQueries()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -44,7 +41,7 @@ fun SearchScreen() {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Number of Searches: $searchQueriesCount")
+        Text("Number of Searches: ${dbHandler.countSearchQueries()}")
         Button(onClick = {
             dbHandler.addSearchQuery(query) // Store the search query
             scope.launch {
@@ -54,7 +51,30 @@ fun SearchScreen() {
                     if (response.hasErrors()) {
                         state = SearchState.Error(response.errors!!.first().message)
                     } else {
-                        state = SearchState.Success(response.data!!)
+                        val podcastSeriesList = response.data?.searchForTerm?.podcastSeries
+                        if (podcastSeriesList != null) {
+                            val podcasts = podcastSeriesList.mapNotNull { series ->
+                                series?.let {
+                                    PodcastModel(
+                                        id = it.uuid?.toIntOrNull() ?: 0,
+                                        podcastDescription = it.name ?: "",
+                                        podcastUrl = it.rssUrl ?: "",
+                                        authorName = "Unknown", // Placeholder
+                                        episodeCount = 0, // Placeholder
+                                        podcastLanguage = "Unknown", // Placeholder
+                                        latestReleaseDate = "Unknown", // Placeholder
+                                        publishedDate = "Unknown", // Placeholder
+                                        genre = "Unknown", // Placeholder
+                                        isComplete = "Unknown", // Placeholder
+                                        isExplicit = "Unknown" // Placeholder
+                                    )
+                                }
+                            }
+                            dbHandler.savePodcasts(podcasts)
+                        }
+                        // Read the latest podcasts from DB and update the UI
+                        val podcastsFromDb = dbHandler.readPodcasts()
+                        state = SearchState.Success(podcastsFromDb)
                     }
                 } catch (e: ApolloException) {
                     state = SearchState.Error(e.localizedMessage ?: "Unknown error")
@@ -67,18 +87,16 @@ fun SearchScreen() {
         when (val s = state) {
             SearchState.Loading -> CircularProgressIndicator()
             is SearchState.Error -> Text(text = s.message, color = Color.Red)
-            is SearchState.Success -> PodcastList(data = s.data.searchForTerm?.podcastSeries)
+            is SearchState.Success -> PodcastList(data = s.data)
             SearchState.Empty -> {}
         }
     }
 }
 
 @Composable
-fun PodcastList(data: List<SearchForTermQuery.PodcastSeries?>?) {
-    data?.let {
-        it.forEach { podcast ->
-            Text(text = "Name: ${podcast?.name}, UUID: ${podcast?.uuid}, RSS URL: ${podcast?.rssUrl}")
-        }
+fun PodcastList(data: List<PodcastModel>) {
+    data.forEach { podcast ->
+        Text(text = "Description: ${podcast.podcastDescription}, URL: ${podcast.podcastUrl}, Author: ${podcast.authorName}")
     }
 }
 
@@ -86,5 +104,5 @@ private sealed interface SearchState {
     object Empty : SearchState
     object Loading : SearchState
     data class Error(val message: String) : SearchState
-    data class Success(val data: SearchQuery.Data) : SearchState
+    data class Success(val data: List<PodcastModel>) : SearchState
 }

@@ -9,7 +9,6 @@ class DBHandler(context: Context?) :
     SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Creating the podcasts table
         val createPodcastsTableQuery = ("CREATE TABLE " + TABLE_NAME + " ("
                 + ID_COL + " INTEGER PRIMARY KEY, "
                 + DESCRIPTION_COL + " TEXT,"
@@ -23,7 +22,6 @@ class DBHandler(context: Context?) :
                 + IS_COMPLETE_COL + " TEXT,"
                 + IS_EXPLICIT_COL + " TEXT)")
 
-        // Creating the search table
         val createSearchTableQuery = "CREATE TABLE $SEARCH_TABLE_NAME (" +
                 "$SEARCH_ID_COL INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "$SEARCH_QUERY_COL TEXT)"
@@ -38,7 +36,6 @@ class DBHandler(context: Context?) :
         onCreate(db)
     }
 
-    // Existing methods for podcasts...
     fun countSearchQueries(): Int {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT COUNT(*) FROM $SEARCH_TABLE_NAME", null)
@@ -49,7 +46,7 @@ class DBHandler(context: Context?) :
         cursor.close()
         return count
     }
-    // New method to add a search query
+
     fun addSearchQuery(query: String) {
         val db = this.writableDatabase
         val values = ContentValues().apply {
@@ -59,7 +56,6 @@ class DBHandler(context: Context?) :
         db.close()
     }
 
-    // New method to read all search queries
     fun readSearchQueries(): List<String> {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $SEARCH_TABLE_NAME", null)
@@ -74,12 +70,58 @@ class DBHandler(context: Context?) :
         return queries
     }
 
+    fun savePodcasts(podcasts: List<PodcastModel>) {
+        val db = this.writableDatabase
+        for (podcast in podcasts) {
+            val values = ContentValues().apply {
+                put(ID_COL, podcast.id)
+                put(DESCRIPTION_COL, podcast.podcastDescription)
+                put(URL_COL, podcast.podcastUrl)
+                put(AUTHOR_COL, podcast.authorName)
+                put(EPISODES_COL, podcast.episodeCount)
+                put(LANGUAGE_COL, podcast.podcastLanguage)
+                put(LATEST_RELEASE_DATE_COL, podcast.latestReleaseDate)
+                put(PUBLISHED_DATE_COL, podcast.publishedDate)
+                put(GENRE_COL, podcast.genre)
+                put(IS_COMPLETE_COL, podcast.isComplete)
+                put(IS_EXPLICIT_COL, podcast.isExplicit)
+            }
+            db.insert(TABLE_NAME, null, values)
+        }
+        db.close()
+    }
+
+    fun readPodcasts(): List<PodcastModel> {
+        val db = this.readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
+        val podcasts = mutableListOf<PodcastModel>()
+
+        if (cursor.moveToFirst()) {
+            do {
+                val podcast = PodcastModel(
+                    id = cursor.getInt(cursor.getColumnIndexOrThrow(ID_COL)),
+                    podcastDescription = cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COL)),
+                    podcastUrl = cursor.getString(cursor.getColumnIndexOrThrow(URL_COL)),
+                    authorName = cursor.getString(cursor.getColumnIndexOrThrow(AUTHOR_COL)),
+                    episodeCount = cursor.getInt(cursor.getColumnIndexOrThrow(EPISODES_COL)),
+                    podcastLanguage = cursor.getString(cursor.getColumnIndexOrThrow(LANGUAGE_COL)),
+                    latestReleaseDate = cursor.getString(cursor.getColumnIndexOrThrow(LATEST_RELEASE_DATE_COL)),
+                    publishedDate = cursor.getString(cursor.getColumnIndexOrThrow(PUBLISHED_DATE_COL)),
+                    genre = cursor.getString(cursor.getColumnIndexOrThrow(GENRE_COL)),
+                    isComplete = cursor.getString(cursor.getColumnIndexOrThrow(IS_COMPLETE_COL)),
+                    isExplicit = cursor.getString(cursor.getColumnIndexOrThrow(IS_EXPLICIT_COL))
+                )
+                podcasts.add(podcast)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return podcasts
+    }
+
     companion object {
         private const val DB_NAME = "podcast"
-        private const val DB_VERSION = 2 // Incremented DB version
+        private const val DB_VERSION = 2
         private const val TABLE_NAME = "podcasts"
-
-        // Constants for podcasts table columns
         private const val ID_COL = "id"
         private const val DESCRIPTION_COL = "description"
         private const val URL_COL = "url"
@@ -91,8 +133,6 @@ class DBHandler(context: Context?) :
         private const val GENRE_COL = "genre"
         private const val IS_COMPLETE_COL = "is_complete"
         private const val IS_EXPLICIT_COL = "is_explicit"
-
-        // Constants for search table and columns
         private const val SEARCH_TABLE_NAME = "searches"
         private const val SEARCH_ID_COL = "id"
         private const val SEARCH_QUERY_COL = "query"
