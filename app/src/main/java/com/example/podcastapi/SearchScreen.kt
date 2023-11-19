@@ -2,7 +2,6 @@ package com.example.podcastapi
 
 import DBHandler
 import androidx.compose.ui.platform.LocalContext
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -16,9 +15,7 @@ import com.apollographql.apollo3.exception.ApolloException
 import com.example.podcastapi.SearchForTermQuery
 import com.example.podcastapi.SearchForTermQuery as SearchQuery
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt //For rand
-import kotlin.random.Random
-import android.util.Log
+
 
 
 @Composable
@@ -55,7 +52,12 @@ fun SearchScreen() {
             scope.launch {
                 state = SearchState.Loading
                 try {
-                    // ... Existing search logic ...
+                    val response = apolloClient.query(SearchQuery(term = query)).execute()
+                    if (response.hasErrors()) {
+                        state = SearchState.Error(response.errors!!.first().message)
+                    } else {
+                        state = SearchState.Success(response.data!!)
+                    }
                 } catch (e: ApolloException) {
                     state = SearchState.Error(e.localizedMessage ?: "Unknown error")
                 }
