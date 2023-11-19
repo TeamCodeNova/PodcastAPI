@@ -42,6 +42,7 @@ fun SearchScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
         Text("Number of Searches: ${dbHandler.countSearchQueries()}")
+        ListPreviousSearches(data = DBHandler.readSearchQueries())
         Button(onClick = {
             dbHandler.addSearchQuery(query) // Store the search query
             scope.launch {
@@ -99,6 +100,18 @@ fun PodcastList(data: List<PodcastModel>) {
         Text(text = "Description: ${podcast.podcastDescription}, URL: ${podcast.podcastUrl}, Author: ${podcast.authorName}")
     }
 }
+@Composable
+fun ListPreviousSearches(data: List<String>)
+{
+    //Dont know if this works
+    data.let {
+        it.forEach { item ->
+            //I dont have a model to go off of, I do not know what values to put here.
+            Text(text = "${item?.toString()}");
+        }
+    }
+}
+
 
 private sealed interface SearchState {
     object Empty : SearchState
