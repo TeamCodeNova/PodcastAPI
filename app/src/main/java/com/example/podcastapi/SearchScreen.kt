@@ -42,7 +42,7 @@ fun SearchScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
         Text("Number of Searches: ${dbHandler.countSearchQueries()}")
-        ListPreviousSearches(data = DBHandler.readSearchQueries())
+        ListPreviousSearches(data = dbHandler.readSearchQueries())
         Button(onClick = {
             dbHandler.addSearchQuery(query) // Store the search query
             scope.launch {
