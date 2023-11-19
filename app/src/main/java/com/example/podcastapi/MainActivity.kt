@@ -21,20 +21,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    fun dbExists(args: Array<String>)
-    {
-//        var filename = "../../../../../data/podcast_db.sqlite"
-//        var file = File(filename)
-//        var fileExists = file.exists()
-//
-//        if(fileExists){
-//            //Do nothing
-//        } else {
-//            var isCreated = file.createNewFile()
-//            if (isCreated)
-//
-//            else
-//                println("File is not created")
-//        }
-    }
 }

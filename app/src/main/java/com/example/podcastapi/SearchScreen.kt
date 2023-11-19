@@ -22,6 +22,9 @@ fun SearchScreen() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dbHandler = remember { DBHandler(context) }
+    val searchQueriesCount = dbHandler.countSearchQueries()
+
+    val latestSearchResult = dbHandler.getAllSearchResults()
 
     Column(
         modifier = Modifier
@@ -41,7 +44,7 @@ fun SearchScreen() {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Number of Searches: ${dbHandler.countSearchQueries()}")
+        Text("Number of Searches: $searchQueriesCount")
         Button(onClick = {
             dbHandler.addSearchQuery(query) // Store the search query
             scope.launch {
@@ -51,30 +54,7 @@ fun SearchScreen() {
                     if (response.hasErrors()) {
                         state = SearchState.Error(response.errors!!.first().message)
                     } else {
-                        val podcastSeriesList = response.data?.searchForTerm?.podcastSeries
-                        if (podcastSeriesList != null) {
-                            val podcasts = podcastSeriesList.mapNotNull { series ->
-                                series?.let {
-                                    PodcastModel(
-                                        id = it.uuid?.toIntOrNull() ?: 0,
-                                        podcastDescription = it.name ?: "",
-                                        podcastUrl = it.rssUrl ?: "",
-                                        authorName = "Unknown", // Placeholder
-                                        episodeCount = 0, // Placeholder
-                                        podcastLanguage = "Unknown", // Placeholder
-                                        latestReleaseDate = "Unknown", // Placeholder
-                                        publishedDate = "Unknown", // Placeholder
-                                        genre = "Unknown", // Placeholder
-                                        isComplete = "Unknown", // Placeholder
-                                        isExplicit = "Unknown" // Placeholder
-                                    )
-                                }
-                            }
-                            dbHandler.savePodcasts(podcasts)
-                        }
-                        // Read the latest podcasts from DB and update the UI
-                        val podcastsFromDb = dbHandler.readPodcasts()
-                        state = SearchState.Success(podcastsFromDb)
+                        state = SearchState.Success(response.data!!)
                     }
                 } catch (e: ApolloException) {
                     state = SearchState.Error(e.localizedMessage ?: "Unknown error")
@@ -87,16 +67,19 @@ fun SearchScreen() {
         when (val s = state) {
             SearchState.Loading -> CircularProgressIndicator()
             is SearchState.Error -> Text(text = s.message, color = Color.Red)
-            is SearchState.Success -> PodcastList(data = s.data)
+            is SearchState.Success -> {
+                // Display the raw data from the database without mapping or formatting
+                PodcastList(data = latestSearchResult)
+            }
             SearchState.Empty -> {}
         }
     }
 }
 
 @Composable
-fun PodcastList(data: List<PodcastModel>) {
+fun PodcastList(data: List<Any>) {
     data.forEach { podcast ->
-        Text(text = "Description: ${podcast.podcastDescription}, URL: ${podcast.podcastUrl}, Author: ${podcast.authorName}")
+        Text(text = "Raw Data: $podcast")
     }
 }
 
@@ -104,5 +87,5 @@ private sealed interface SearchState {
     object Empty : SearchState
     object Loading : SearchState
     data class Error(val message: String) : SearchState
-    data class Success(val data: List<PodcastModel>) : SearchState
+    data class Success(val data: SearchQuery.Data) : SearchState
 }

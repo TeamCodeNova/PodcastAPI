@@ -3,7 +3,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.podcastapi.PodcastModel
-import android.util.Log
 
 class DBHandler(context: Context?) :
     SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
@@ -56,19 +55,7 @@ class DBHandler(context: Context?) :
         db.close()
     }
 
-    fun readSearchQueries(): List<String> {
-        val db = this.readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $SEARCH_TABLE_NAME", null)
-        val queries = mutableListOf<String>()
 
-        if (cursor.moveToFirst()) {
-            do {
-                queries.add(cursor.getString(cursor.getColumnIndex(SEARCH_QUERY_COL)))
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        return queries
-    }
 
     fun savePodcasts(podcasts: List<PodcastModel>) {
         val db = this.writableDatabase
@@ -91,10 +78,10 @@ class DBHandler(context: Context?) :
         db.close()
     }
 
-    fun readPodcasts(): List<PodcastModel> {
+    fun getAllSearchResults(): List<PodcastModel> {
         val db = this.readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_NAME", null)
-        val podcasts = mutableListOf<PodcastModel>()
+        val latestSearchResult = mutableListOf<PodcastModel>()
 
         if (cursor.moveToFirst()) {
             do {
@@ -111,11 +98,11 @@ class DBHandler(context: Context?) :
                     isComplete = cursor.getString(cursor.getColumnIndexOrThrow(IS_COMPLETE_COL)),
                     isExplicit = cursor.getString(cursor.getColumnIndexOrThrow(IS_EXPLICIT_COL))
                 )
-                podcasts.add(podcast)
+                latestSearchResult.add(podcast)
             } while (cursor.moveToNext())
         }
         cursor.close()
-        return podcasts
+        return latestSearchResult
     }
 
     companion object {
