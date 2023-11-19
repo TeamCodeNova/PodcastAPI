@@ -22,7 +22,7 @@ fun SearchScreen() {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val dbHandler = remember { DBHandler(context) }
-
+    var search = false
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -42,9 +42,13 @@ fun SearchScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
         Text("Number of Searches: ${dbHandler.countSearchQueries()}")
-        ListPreviousSearches(data = dbHandler.readSearchQueries())
+        if(!search)
+        {
+            ListPreviousSearches(data = dbHandler.readSearchQueries(), length = dbHandler.countSearchQueries())
+        }
         Button(onClick = {
             dbHandler.addSearchQuery(query) // Store the search query
+            search = true
             scope.launch {
                 state = SearchState.Loading
                 try {
@@ -101,17 +105,22 @@ fun PodcastList(data: List<PodcastModel>) {
     }
 }
 @Composable
-fun ListPreviousSearches(data: List<String>)
+fun ListPreviousSearches(data: List<String>, length: Int)
 {
+    var displayLength = length
+    if(length > 5)
+    {
+        displayLength = 5
+    }
+    Text(text = "Showing last ${displayLength}")
     //Dont know if this works
-    data.let {
+    data.reversed().take(displayLength).let {
         it.forEach { item ->
             //I dont have a model to go off of, I do not know what values to put here.
             Text(text = "${item?.toString()}");
         }
     }
 }
-
 
 private sealed interface SearchState {
     object Empty : SearchState
