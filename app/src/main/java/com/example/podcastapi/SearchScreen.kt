@@ -14,6 +14,8 @@ import com.example.podcastapi.SearchForTermQuery
 import com.example.podcastapi.SearchForTermQuery as SearchQuery
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun SearchScreen() {
@@ -29,6 +31,14 @@ fun SearchScreen() {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Display the total count of searches
+        Text(
+            text = "Total Search Results: ${dbHandler.getSearchCount()}",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(8.dp)
+        )
+
         // Input field for user's search query
         BasicTextField(
             value = query,
@@ -113,8 +123,8 @@ fun PodcastList(data: List<SearchForTermQuery.PodcastSeries?>?) {
 
 // Define the possible search states
 sealed interface SearchState {
-    object Empty : SearchState
-    object Loading : SearchState
+    data object Empty : SearchState
+    data object Loading : SearchState
     data class Error(val message: String) : SearchState
     data class Success(val data: SearchQuery.Data) : SearchState
 }

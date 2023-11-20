@@ -10,8 +10,14 @@ class DbHandler(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase) {
-        val createTable =
-            "CREATE TABLE IF NOT EXISTS $TABLE_NAME ($COLUMN_UUID TEXT PRIMARY KEY, $COLUMN_NAME TEXT, $COLUMN_RSS_URL TEXT)"
+        val createTable = """
+        CREATE TABLE IF NOT EXISTS $TABLE_NAME (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            $COLUMN_UUID TEXT, 
+            $COLUMN_NAME TEXT, 
+            $COLUMN_RSS_URL TEXT
+        )
+    """.trimIndent()
         db.execSQL(createTable)
     }
 
@@ -30,9 +36,24 @@ class DbHandler(context: Context) :
         db.close()
     }
 
+    fun getSearchCount(): Int {
+        val db = this.readableDatabase
+        val query = "SELECT COUNT(*) FROM $TABLE_NAME"
+        val cursor = db.rawQuery(query, null)
+        var count = 0
+
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0)
+        }
+
+        cursor.close()
+        db.close()
+        return count
+    }
+
     fun getData(): Cursor {
         val db = this.readableDatabase
-        return db.rawQuery("SELECT * FROM $TABLE_NAME", null)
+        return db.rawQuery("SELECT * FROM $TABLE_NAME ORDER BY id DESC", null)
     }
 
     companion object {
