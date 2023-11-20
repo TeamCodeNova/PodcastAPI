@@ -1,7 +1,5 @@
 package com.example.podcastapi
 
-import DBHandler
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -12,26 +10,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.apollographql.apollo3.exception.ApolloException
+import com.example.podcastapi.SearchForTermQuery
 import com.example.podcastapi.SearchForTermQuery as SearchQuery
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SearchScreen() {
-    var query by remember { mutableStateOf("") }
-    var state by remember { mutableStateOf<SearchState>(SearchState.Empty) }
+    // Initialize variables
+    var query by remember { mutableStateOf("") } // User's search query
+    var state by remember { mutableStateOf<SearchState>(SearchState.Empty) } // State of the search
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val dbHandler = remember { DBHandler(context) }
-    var search = false
+    val dbHandler = DbHandler(context) // Database handler
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        // Input field for user's search query
         BasicTextField(
             value = query,
             onValueChange = {
-                query = it
+                query = it // Update the query as the user types
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -41,90 +43,78 @@ fun SearchScreen() {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Number of Searches: ${dbHandler.countSearchQueries()}")
-        if(!search)
-        {
-            ListPreviousSearches(data = dbHandler.readSearchQueries(), length = dbHandler.countSearchQueries())
-        }
+
+        // Search button
         Button(onClick = {
-            dbHandler.addSearchQuery(query) // Store the search query
-            search = true
             scope.launch {
-                state = SearchState.Loading
+                state = SearchState.Loading // Set the state to Loading
                 try {
                     val response = apolloClient.query(SearchQuery(term = query)).execute()
                     if (response.hasErrors()) {
-                        state = SearchState.Error(response.errors!!.first().message)
+                        state = SearchState.Error(response.errors!!.first().message) // Handle Apollo query errors
                     } else {
-                        val podcastSeriesList = response.data?.searchForTerm?.podcastSeries
-                        if (podcastSeriesList != null) {
-                            val podcasts = podcastSeriesList.mapNotNull { series ->
-                                series?.let {
-                                    PodcastModel(
-                                        id = it.uuid?.toIntOrNull() ?: 0,
-                                        podcastDescription = it.name ?: "",
-                                        podcastUrl = it.rssUrl ?: "",
-                                        authorName = "Unknown", // Placeholder
-                                        episodeCount = 0, // Placeholder
-                                        podcastLanguage = "Unknown", // Placeholder
-                                        latestReleaseDate = "Unknown", // Placeholder
-                                        publishedDate = "Unknown", // Placeholder
-                                        genre = "Unknown", // Placeholder
-                                        isComplete = "Unknown", // Placeholder
-                                        isExplicit = "Unknown" // Placeholder
-                                    )
-                                }
-                            }
-                            dbHandler.savePodcasts(podcasts)
+                        state = SearchState.Success(response.data!!) // Set state to Success
+
+                        // Save data to SQLite database
+                        response.data?.searchForTerm?.podcastSeries?.forEach { podcast ->
+                            dbHandler.insertData(podcast?.uuid ?: "", podcast?.name ?: "", podcast?.rssUrl ?: "")
                         }
-                        // Read the latest podcasts from DB and update the UI
-                        val podcastsFromDb = dbHandler.readPodcasts()
-                        state = SearchState.Success(podcastsFromDb)
                     }
                 } catch (e: ApolloException) {
-                    state = SearchState.Error(e.localizedMessage ?: "Unknown error")
+                    state = SearchState.Error(e.localizedMessage ?: "Unknown error") // Handle Apollo exception
                 }
             }
         }) {
             Text(text = "Search")
         }
 
+        // Display results based on search state
         when (val s = state) {
-            SearchState.Loading -> CircularProgressIndicator()
-            is SearchState.Error -> Text(text = s.message, color = Color.Red)
-            is SearchState.Success -> PodcastList(data = s.data)
-            SearchState.Empty -> {}
+            SearchState.Loading -> CircularProgressIndicator() // Show loading indicator
+            is SearchState.Error -> Text(text = s.message, color = Color.Red) // Show error message
+            is SearchState.Success -> {
+                // Retrieve data from the database and convert it to the required type
+                val podcastList = mutableListOf<SearchForTermQuery.PodcastSeries?>()
+                val cursor = dbHandler.getData()
+                if (cursor.moveToFirst()) {
+                    do {
+                        val uuidIndex = cursor.getColumnIndex(DbHandler.COLUMN_UUID)
+                        val nameIndex = cursor.getColumnIndex(DbHandler.COLUMN_NAME)
+                        val rssUrlIndex = cursor.getColumnIndex(DbHandler.COLUMN_RSS_URL)
+
+                        val uuid = cursor.getString(uuidIndex)
+                        val name = cursor.getString(nameIndex)
+                        val rssUrl = cursor.getString(rssUrlIndex)
+
+                        // Convert PodcastEntry to SearchForTermQuery.PodcastSeries
+                        val podcastSeries = SearchForTermQuery.PodcastSeries(uuid = uuid, name = name, rssUrl = rssUrl)
+                        podcastList.add(podcastSeries)
+                    } while (cursor.moveToNext())
+                }
+                cursor.close()
+
+                // Display data in PodcastList composable
+                PodcastList(data = podcastList)
+            }
+            SearchState.Empty -> {} // No action for empty state
         }
     }
 }
 
+// Composable function to display podcast data retrieved from the SQLite database
 @Composable
-fun PodcastList(data: List<PodcastModel>) {
-    data.forEach { podcast ->
-        Text(text = "Description: ${podcast.podcastDescription}, URL: ${podcast.podcastUrl}, Author: ${podcast.authorName}")
-    }
-}
-@Composable
-fun ListPreviousSearches(data: List<String>, length: Int)
-{
-    var displayLength = length
-    if(length > 5)
-    {
-        displayLength = 5
-    }
-    Text(text = "Showing last ${displayLength}")
-    //Dont know if this works
-    data.reversed().take(displayLength).let {
-        it.forEach { item ->
-            //I dont have a model to go off of, I do not know what values to put here.
-            Text(text = "${item?.toString()}");
+fun PodcastList(data: List<SearchForTermQuery.PodcastSeries?>?) {
+    data?.let {
+        it.forEach { podcast ->
+            Text(text = "Name: ${podcast?.name}, UUID: ${podcast?.uuid}, RSS URL: ${podcast?.rssUrl}")
         }
     }
 }
 
-private sealed interface SearchState {
+// Define the possible search states
+sealed interface SearchState {
     object Empty : SearchState
     object Loading : SearchState
     data class Error(val message: String) : SearchState
-    data class Success(val data: List<PodcastModel>) : SearchState
+    data class Success(val data: SearchQuery.Data) : SearchState
 }
